@@ -2,11 +2,13 @@
 #include <map>
 #include <tuple>
 #include <list>
+#include <unordered_map>
+#include <iostream>
 
 using namespace std;
 
-list<tuple<string,int,string>> instrucoes;
-list<tuple<string,int>> diretivas;
+unordered_map<string,tuple<int,string>> instrucoes;
+unordered_map<string,int> diretivas;
 
 void PopulaInstrucoes();
 void PopulaDiretivas();
