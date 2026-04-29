@@ -1,7 +1,7 @@
 #include <passagem_unica.hpp>
 
 bool IsInstrucao(string instrucao) {
-    unordered_map<string,  tuple<int, string>>::const_iterator it = instrucoes.find(instrucao);
+    unordered_map<string, tuple<int, string>>::const_iterator it = instrucoes.find(instrucao);
     if (it != instrucoes.end())
         return true;
     else 
@@ -17,7 +17,7 @@ bool IsDiretiva(string diretiva) {
 }
 
 string GetOpcodeInstrucao(string instrucao) {
-    unordered_map<string,  tuple<int, string>>::const_iterator it = instrucoes.find(instrucao);
+    unordered_map<string, tuple<int, string>>::const_iterator it = instrucoes.find(instrucao);
 
     string opcode = get<1>(it->second);
 
@@ -25,7 +25,7 @@ string GetOpcodeInstrucao(string instrucao) {
 }
 
 int GetQuantidadeOperandosInstrucao(string instrucao) {
-    unordered_map<string,  tuple<int, string>>::const_iterator it = instrucoes.find(instrucao);
+    unordered_map<string, tuple<int, string>>::const_iterator it = instrucoes.find(instrucao);
 
     int operandos = get<0>(it->second);
 
@@ -33,7 +33,7 @@ int GetQuantidadeOperandosInstrucao(string instrucao) {
 }
 
 int GetQuantidadeOperandosDiretiva(string diretiva) {
-    unordered_map<string,  int>::const_iterator it = diretivas.find(diretiva);
+    unordered_map<string, int>::const_iterator it = diretivas.find(diretiva);
 
     int operandos = it->second;
 
@@ -84,18 +84,17 @@ void UpdateListaPendencias(string label, int endereco) {
     get<2>(tabelaDePendencias.find(label)->second).emplace_front(endereco);
 }
 
-tuple<string, int> resolveInstrucao(string opcode, string operando, int posicao) {
+tuple<string, int> ResolveInstrucao(string opcode, string operando, int posicao) {
     if (LabelDefinido(operando)) {
         return tuple(opcode, GetEndereco(operando));
     }
     else {
         unordered_map<string, tuple<bool, int, list<int>>>::const_iterator it = tabelaDePendencias.find(operando);
-        if (it != tabelaDePendencias.end()) {
+        if (it != tabelaDePendencias.end())
             UpdateListaPendencias(operando, posicao + 1);
-        }
-
+        else
+            InsertPendencia(operando, posicao + 1, false);
     }
-    
 }
 
 void Parser(string path_arquivo) {
