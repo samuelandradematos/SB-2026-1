@@ -30,8 +30,11 @@ int main(int argc, char *argv[]) {
     while (getline(arquivo, linha)) {
         // 1. Remover comentários
         linha = removeComments(linha);
-        
-        // se depois de remover comentários, a linha é vazia, só ignora ela
+
+        // 2. Remover espacos desnecessário
+        linha = removeUnnecessarySpaces(linha);
+
+        // se depois de remover comentários e espacos a linha é vazia, só ignora ela
         if (linha.empty()) continue;
         
         // 2. Converter tudo para maíusculo
