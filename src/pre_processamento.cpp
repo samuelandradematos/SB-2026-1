@@ -13,3 +13,13 @@ std::string toUpperCase(std::string linha)
                    [](unsigned char c) { return std::toupper(c); });
     return linha;
 }
+
+std::string removeComments(std::string linha){
+    size_t position = linha.find(";");
+    
+    if (position != std::string::npos) {
+        return linha.substr(0, position);
+    }
+
+    return linha;
+}

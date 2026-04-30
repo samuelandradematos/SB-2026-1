@@ -28,11 +28,16 @@ int main(int argc, char *argv[]) {
     // LER O ARQUIVO
     std::string linha;
     while (getline(arquivo, linha)) {
-        // 1. Converter tudo para maíusculo
-        linha = toUpperCase(linha);
-
+        // 1. Remover comentários
+        linha = removeComments(linha);
         
-        // std::cout << linha << std::endl;
+        // se depois de remover comentários, a linha é vazia, só ignora ela
+        if (linha.empty()) continue;
+        
+        // 2. Converter tudo para maíusculo
+        linha = toUpperCase(linha);
+        std::cout << linha << std::endl;
+
     }
 
     arquivo.close();

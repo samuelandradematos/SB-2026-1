@@ -7,4 +7,5 @@
 
 bool isArquivoASM(const std::string& nome);
 std::string toUpperCase(std::string linha);
+std::string removeComments(std::string linha);
 #endif
