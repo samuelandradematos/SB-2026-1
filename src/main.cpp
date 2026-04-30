@@ -28,6 +28,10 @@ int main(int argc, char *argv[]) {
     // LER O ARQUIVO
     std::string linha;
     while (getline(arquivo, linha)) {
+        // 1. Converter tudo para maíusculo
+        linha = toUpperCase(linha);
+
+        
         // std::cout << linha << std::endl;
     }
 
