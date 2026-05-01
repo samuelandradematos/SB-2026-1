@@ -12,6 +12,8 @@ int main(int argc, char *argv[]) {
     // ABRIR O ARQUIVO
     std::string nomeArquivo = argv[1];
     std::ifstream arquivo(nomeArquivo);
+    std::string rotuloIsolado = "";
+
 
     if (!isArquivoASM(nomeArquivo)) {
         std::cerr << "Erro: o arquivo deve ter extensao .asm" << std::endl;
@@ -28,6 +30,7 @@ int main(int argc, char *argv[]) {
     // LER O ARQUIVO
     std::string linha;
     while (getline(arquivo, linha)) {
+
         // 1. Remover comentários
         linha = removeComments(linha);
 
@@ -39,8 +42,21 @@ int main(int argc, char *argv[]) {
         
         // 2. Converter tudo para maíusculo
         linha = toUpperCase(linha);
-        std::cout << linha << std::endl;
+    
+        // se tem rótulo isolado, adiciona na frente da linha
+        // TODO: Não funciona para multiplos rótulos isolados seguidos
+        if(rotuloIsolado != ""){
+            linha = rotuloIsolado + " " + linha;
+            rotuloIsolado.clear();
+        }
+        
+        // Se a linha termina com :, é um rótulo isolado. Armazena para unir com a próxima linha
+        if(linha.back() == ':'){
+            rotuloIsolado = linha;
+            continue;
+        }
 
+        std::cout << linha << std::endl;
     }
 
     arquivo.close();
