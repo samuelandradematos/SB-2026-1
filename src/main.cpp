@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
 
     std::cout << "Arquivo aberto com sucesso!" << std::endl;
 
-    // LER O ARQUIVO - 1 PASAGEM DO PRE-PROCESSAMENTO
+    // LER O ARQUIVO
     std::string linha;
     while (getline(arquivo, linha))
     {
@@ -71,12 +71,11 @@ int main(int argc, char *argv[])
             rotuloIsolado.clear();
         }
 
-        // 4. Verifica se tem diretiva EQU
-        if (storeEQUs(linha, tabelaEQU))
-        {
-            // se tiver EQU, ela nao é escrita no arquivo e vai ser armazenada para a segunda passagem do pre-processamento
-            continue;
-        }
+        // 4. Verifica se tem diretiva EQU e substituir
+        // se o armazenamento tiver sucesso, segue, nao escreve a linha no arquivo
+        if (storeEQUs(linha, tabelaEQU)) continue;
+        
+        linha = substituirEQU(linha, tabelaEQU);
 
         arquivoPreGerado << linha << std::endl;
     }
@@ -84,34 +83,6 @@ int main(int argc, char *argv[])
     arquivo.close();
     arquivoPreGerado.close();
 
-    // LER O ARQUIVO - 2 PASAGEM DO PRE-PROCESSAMENTO
-
-    std::ifstream arquivoPre(nomeArquivoPreGerado);
-
-    if (!arquivoPre.is_open())
-    {
-        std::cerr << "Erro ao abrir arquivo .pre" << std::endl;
-        return 1;
-    }
-
-    std::vector<std::string> linhas;
-
-    while (getline(arquivoPre, linha))
-    {
-        linha = substituirEQU(linha, tabelaEQU);
-        linhas.push_back(linha);
-    }
-
-    arquivoPre.close();
-
-    // sobrescreve o arquivo
-    std::ofstream arquivoPreGerado2(nomeArquivoPreGerado);
-
-    for (const auto &l : linhas)
-    {
-        arquivoPreGerado2 << l << std::endl;
-    }
-
-    arquivoPreGerado2.close();
+    
     return 0;
 }
