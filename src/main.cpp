@@ -13,6 +13,9 @@ int main(int argc, char *argv[])
     // ABRIR O ARQUIVO
     std::string nomeArquivo = argv[1];
     std::ifstream arquivo(nomeArquivo);
+
+    std::string nomeArquivoPreGerado = nomeArquivo.substr(0, nomeArquivo.size() - 4) + ".pre";
+    std::ofstream arquivoPreGerado(nomeArquivoPreGerado);
     std::string rotuloIsolado = "";
 
     if (!isArquivoASM(nomeArquivo))
@@ -52,7 +55,8 @@ int main(int argc, char *argv[])
         if (linha.back() == ':'){
             if (!rotuloIsolado.empty()){
                 // se já tem rótulo, escreve uma linha com rótulo o anterior
-                std::cout << rotuloIsolado << std::endl;
+                arquivoPreGerado << rotuloIsolado << std::endl;
+
             }
             rotuloIsolado = linha; // guarda o atual
             continue;
@@ -64,7 +68,7 @@ int main(int argc, char *argv[])
             rotuloIsolado.clear();
         }
 
-        std::cout << linha << std::endl;
+        arquivoPreGerado << linha << std::endl;
 
     }
 
