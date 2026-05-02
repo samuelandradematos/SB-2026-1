@@ -8,13 +8,15 @@ int main(int argc, char* argv[]){
 
     if (get<0>(validaChamada)) {
         if (get<1>(validaChamada) == "pre"){
-            //Chamadas para o pré-processamento
+            string nomeArquivoSaida = argv[1];
+            nomeArquivoSaida.replace(nomeArquivoSaida.find(".pre"), strlen(".pre"), "");
+            Parser(nomeArquivoSaida);
         }
         if (get<1>(validaChamada) == "asm"){
-            //Chamadas para o montandor
+            //Chamadas para pre-processamento
         }
-        if (get<1>(validaChamada) == "pen"){
-            //Chamadas para o algoritmo de passagem única
+        if (get<1>(validaChamada) == "obj"){
+            //Chamadas para o simulador
         }
 
     }

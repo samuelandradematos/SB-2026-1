@@ -64,20 +64,6 @@ void InsertPendencia(string label, string posicaoMemoria, bool definido = false)
     tabelaDePendencias.emplace(label, make_tuple(definido, posicaoMemoria, posicaoPendencia));
 }
 
-void PrintTabelaDePendencias() {
-    cout << "Label  " << "      |       " << "  Definido    " << "      |       " << "  Endereço Real   " << "      |       " << "  Pendencias" << endl;
-    string auxOutput = "";
-    for (auto& it: tabelaDePendencias) {
-        auxOutput += it.first + "           |           " + (get<0>(it.second) ? "T" : "F") + "         |           " + to_string(get<1>(it.second)) + "         |           ";
-        auxOutput += "[";
-        for (auto& k: get<2>(it.second))
-            auxOutput += k + ", ";
-        auxOutput.substr(0,  auxOutput.size() - 2);
-        auxOutput += "]";
-        cout << auxOutput << endl;
-    }
-}
-
 void InsertSimbolo(string label, bool definido, int endereco) {
     list<int> auxListEndereco;
     auxListEndereco.emplace_front(endereco);
@@ -181,31 +167,39 @@ void UpdateLabelDefinido(string label, int posicao) {
     it->second = make_tuple(true, posicao, get<2>(it->second));
 }
 
-void CriaArquivoSaida(list<tuple<string,string>> codigo, string nomeArquivo) {
-    ofstream saida(nomeArquivo + ".pen");
+void CriaArquivoSaida(list<tuple<string,string>> codigo, string nomeArquivo, string extensao) {
+    ofstream saida(nomeArquivo + "." + extensao);
 
-    for (auto& instrucao : codigo) {
-        saida << GetOpcodeInstrucao(get<0>(instrucao)) << " " << get<1>(instrucao);
+    if (extensao == "obj") {
+        for (auto& instrucao : codigo) {
+            saida << GetOpcodeInstrucao(get<0>(instrucao)) << " " << get<1>(instrucao);
+        }
     }
 
-    saida << endl;
+    if (extensao == "pen") {
+        for (auto& instrucao : codigo) {
+            saida << GetOpcodeInstrucao(get<0>(instrucao)) << " " << get<1>(instrucao);
+        }
 
-    saida << "Label  " << "      |       " << "  Definido    " << "      |       " << "  Endereço Real   " << "      |       " << "  Pendencias" << endl;
-    string auxOutput = "";
-    for (auto& it: tabelaDePendencias) {
-        auxOutput += it.first + "           |           " + (get<0>(it.second) ? "T" : "F") + "         |           " + to_string(get<1>(it.second)) + "         |           ";
-        auxOutput += "[";
-        for (auto& k: get<2>(it.second))
-            auxOutput += k + ", ";
-        auxOutput.substr(0,  auxOutput.size() - 2);
-        auxOutput += "]";
-        saida << auxOutput << endl;
+        saida << endl;
+
+        saida << "Label  " << "      |       " << "  Definido    " << "      |       " << "  Endereço Real   " << "      |       " << "  Pendencias" << endl;
+        string auxOutput = "";
+        for (auto& it: tabelaDePendencias) {
+            auxOutput += it.first + "           |           " + (get<0>(it.second) ? "T" : "F") + "         |           " + to_string(get<1>(it.second)) + "         |           ";
+            auxOutput += "[";
+            for (auto& k: get<2>(it.second))
+                auxOutput += k + ", ";
+            auxOutput.substr(0,  auxOutput.size() - 2);
+            auxOutput += "]";
+            saida << auxOutput << endl;
+        }
     }
 }
 
-void Parser(string pathArquivo, string nomeArquivo) {       
+void Parser(string ArquivoIn) {       
     fstream arquivo;
-    arquivo.open(pathArquivo);
+    arquivo.open(ArquivoIn);
     list<tuple<string,string>> codigoMaquina;
     string linha;
     string opcodeCopy = "09";
@@ -358,7 +352,9 @@ void Parser(string pathArquivo, string nomeArquivo) {
         }
     }
 
-    CriaArquivoSaida(codigoMaquina, nomeArquivo);
+    CriaArquivoSaida(codigoMaquina, ArquivoIn, "obj");
+
+    CriaArquivoSaida(codigoMaquina, ArquivoIn, "pen");
 
 }
  
