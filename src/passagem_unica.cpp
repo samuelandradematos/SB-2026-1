@@ -41,7 +41,7 @@ int GetQuantidadeOperandosDiretiva(string diretiva) {
 }
 
 bool LabelDefinido(string label) {
-    unordered_map<string, tuple<bool, int, list<int>>>::const_iterator it = tabelaDePendencias.find(label);
+    unordered_map<string, tuple<bool, int, list<string>>>::const_iterator it = tabelaDePendencias.find(label);
     if (it == tabelaDePendencias.end()) {
         return false;
     }
@@ -50,10 +50,18 @@ bool LabelDefinido(string label) {
     }
 }
 
-void InsertPendencia(string label, int posicaoMemoria, bool definido) {
-    list<int> posicaoPendencia;
+bool LabelNaTabela(string label) {
+    unordered_map<string, tuple<bool, int, list<string>>>::const_iterator it = tabelaDePendencias.find(label);
+    if (it == tabelaDePendencias.end())
+        return false;
+    else
+        return true;
+}
+
+void InsertPendencia(string label, string posicaoMemoria, bool definido = false) {
+    list<string> posicaoPendencia;
     posicaoPendencia.emplace_front(posicaoMemoria);
-    tabelaDePendencias.emplace(label, tuple(definido, posicaoMemoria, posicaoPendencia));
+    tabelaDePendencias.emplace(label, make_tuple(definido, posicaoMemoria, posicaoPendencia));
 }
 
 void PrintTabelaDePendencias() {
@@ -61,8 +69,9 @@ void PrintTabelaDePendencias() {
     string auxOutput = "";
     for (auto& it: tabelaDePendencias) {
         auxOutput += it.first + "           |           " + (get<0>(it.second) ? "T" : "F") + "         |           " + to_string(get<1>(it.second)) + "         |           ";
+        auxOutput += "[";
         for (auto& k: get<2>(it.second))
-            auxOutput += "[" + to_string(k) + ", ";
+            auxOutput += k + ", ";
         auxOutput.substr(0,  auxOutput.size() - 2);
         auxOutput += "]";
         cout << auxOutput << endl;
@@ -70,42 +79,286 @@ void PrintTabelaDePendencias() {
 }
 
 void InsertSimbolo(string label, bool definido, int endereco) {
-    list<string> auxListEndereco;
+    list<int> auxListEndereco;
     auxListEndereco.emplace_front(endereco);
-    tabelaDePendencias.emplace(label,  tuple(definido,  endereco,  auxListEndereco));
+    tabelaDePendencias.emplace(label,  make_tuple(definido,  endereco,  auxListEndereco));
 }
 
-int GetEndereco(string label) {
-    unordered_map<string, tuple<bool, int, list<int>>>::const_iterator it = tabelaDePendencias.find(label);
-    return get<1>(it->second);
+string GetEndereco(string label) {
+    unordered_map<string, tuple<bool, int, list<string>>>::const_iterator it = tabelaDePendencias.find(label);
+    return to_string(get<1>(it->second));
 }
 
-void UpdateListaPendencias(string label, int endereco) {
+void UpdateListaPendencias(string label, string endereco) {
     get<2>(tabelaDePendencias.find(label)->second).emplace_front(endereco);
 }
 
-tuple<string, int> ResolveInstrucao(string opcode, string operando, int posicao) {
-    if (LabelDefinido(operando)) {
-        return tuple(opcode, GetEndereco(operando));
+string ConverteIntEndereco(int posicao) {
+    string endereco = to_string(posicao);
+    if (endereco.length() < 2)
+        endereco.insert(0, 2 - endereco.length(), '0');
+    
+    return endereco;
+}
+
+string ResolveInstrucao(string opcode, string operando, int posicao) {
+    string auxRetorno;
+    string auxPosicao;
+    
+    if (opcode == "COPY") {
+        string operando1 = operando.substr(0, operando.find(","));
+        string operando2 = operando.substr(operando.find(",") + 1, operando.size());
+        if (LabelDefinido(operando1)) {
+            auxRetorno = GetEndereco(operando1);
+        }
+        else {
+            if (LabelNaTabela(operando1)) {
+                UpdateListaPendencias(operando1, ConverteIntEndereco(posicao + 1));
+                auxRetorno = ConverteIntEndereco(posicao + 1);
+            }
+            else {
+                InsertPendencia(operando1, ConverteIntEndereco(posicao + 1));
+                auxRetorno = ConverteIntEndereco(posicao + 1);
+            }
+        }
+
+        if (LabelDefinido(operando2)) {
+            auxRetorno += " " + GetEndereco(operando2);
+        }
+        else {
+            if (LabelNaTabela(operando2)) {
+                UpdateListaPendencias(operando2, ConverteIntEndereco(posicao + 2));
+                auxRetorno += " " + ConverteIntEndereco(posicao + 2);
+            }
+            else {
+                InsertPendencia(operando2, ConverteIntEndereco(posicao + 2));
+                auxRetorno += " " + ConverteIntEndereco(posicao + 2);
+            }
+        }
+        
     }
     else {
-        unordered_map<string, tuple<bool, int, list<int>>>::const_iterator it = tabelaDePendencias.find(operando);
-        if (it != tabelaDePendencias.end())
-            UpdateListaPendencias(operando, posicao + 1);
-        else
-            InsertPendencia(operando, posicao + 1, false);
+        if (LabelDefinido(operando)) {
+            auxRetorno = GetEndereco(operando);
+        }
+        else {
+            if (LabelNaTabela(operando)) {
+                UpdateListaPendencias(operando, ConverteIntEndereco(posicao + 1));
+                auxRetorno = ConverteIntEndereco(posicao + 1);
+            }
+            else {
+                InsertPendencia(operando,ConverteIntEndereco(posicao + 1));
+                auxRetorno = ConverteIntEndereco(posicao + 1);
+            }
+        }
+    }
+        return auxRetorno;
+}
+
+tuple<string,string,string> getConteudoLinha(string linha) {
+    string label,opcode,operando;
+    int posProxSubString;
+
+    if (linha.find(":") != string::npos) {
+        label = linha.substr(0,linha.find(":"));
+        posProxSubString = linha.find(":") + strlen(":");
+        linha = linha.substr(posProxSubString,linha.size());
+    }
+
+    if (linha.find(" ") != string::npos) {
+        opcode = linha.substr(0, linha.find(" "));
+        operando = linha.substr(linha.find(" ") + 1, linha.size());
+    }
+    else {
+        opcode = linha;
+    }
+
+    return make_tuple(label,opcode,operando);
+}
+
+void UpdateLabelDefinido(string label, int posicao) {
+    unordered_map<string, tuple<bool, int, list<string>>>::iterator it = tabelaDePendencias.find(label);
+    it->second = make_tuple(true, posicao, get<2>(it->second));
+}
+
+void CriaArquivoSaida(list<tuple<string,string>> codigo, string nomeArquivo) {
+    ofstream saida(nomeArquivo + ".pen");
+
+    for (auto& instrucao : codigo) {
+        saida << GetOpcodeInstrucao(get<0>(instrucao)) << " " << get<1>(instrucao);
+    }
+
+    saida << endl;
+
+    saida << "Label  " << "      |       " << "  Definido    " << "      |       " << "  Endereço Real   " << "      |       " << "  Pendencias" << endl;
+    string auxOutput = "";
+    for (auto& it: tabelaDePendencias) {
+        auxOutput += it.first + "           |           " + (get<0>(it.second) ? "T" : "F") + "         |           " + to_string(get<1>(it.second)) + "         |           ";
+        auxOutput += "[";
+        for (auto& k: get<2>(it.second))
+            auxOutput += k + ", ";
+        auxOutput.substr(0,  auxOutput.size() - 2);
+        auxOutput += "]";
+        saida << auxOutput << endl;
     }
 }
 
-void Parser(string path_arquivo) {
+void Parser(string pathArquivo, string nomeArquivo) {       
     fstream arquivo;
-    arquivo.open(path_arquivo);
-    
-    // TODO:
-    //      lógica de leitura de cada linha(icluir contador de posição)
-    //      para cada linha - verificar se contém definição de label e se tiver inserir na tabelaDePendencias como label definido
-    //                        verificar se o operando já está na tabelaDePendencias:
-    //                                                                              se estiver e já foi definido, retornar endereço
-    //                                                                              se estiver e não foi definido, adicinar posição na lista de pendências
-    //                                                                              se não estiver, adicionar na tabelaDePendencias
+    arquivo.open(pathArquivo);
+    list<tuple<string,string>> codigoMaquina;
+    string linha;
+    string opcodeCopy = "09";
+    tuple<string,string,string> camposDaLinha;
+    int contador = 0;
+
+    while (!arquivo.eof()) {
+        getline(arquivo,linha);
+        camposDaLinha = getConteudoLinha(linha);
+        
+        // Verifica se tem label na linha
+        if (!get<0>(camposDaLinha).empty()) {
+            // Verifica se o label não está definido
+            if (!LabelDefinido(get<0>(camposDaLinha))) {
+                // Caso não esteja, verifica se ele está na tabela
+                if (LabelNaTabela(get<0>(camposDaLinha))) {
+                    UpdateLabelDefinido(get<0>(camposDaLinha), contador);
+                }
+                else {
+                    // Como não está na tabela, insere na tabela de simbolos
+                    InsertPendencia(get<0>(camposDaLinha),ConverteIntEndereco(contador),true);
+                    // Verifica se o label é uma instrucao
+                    if (IsInstrucao(get<1>(camposDaLinha))) {
+                        codigoMaquina.emplace_back(
+                                                    make_tuple(
+                                                                get<1>(camposDaLinha),
+                                                                ResolveInstrucao(
+                                                                                    get<1>(camposDaLinha),
+                                                                                    get<2>(camposDaLinha),
+                                                                                    contador
+                                                                                )
+                                                            )
+                                                );
+                        // Verifica se é COPY, para incrementar o contador em 3 caso seja
+                        if(get<1>(camposDaLinha) == "COPY") {
+                            contador += 3;
+                        }
+                        // Verifica se é STOP, para incrementar o contador em 1 caso seja
+                        else if (get<1>(camposDaLinha) == "STOP") {
+                            contador += 1;
+                        }
+                        // Para todas as outras instrucoes, incrementa o contador em 2
+                        else {
+                            contador += 2;
+                        }
+                    }
+                    else {
+                        if (get<1>(camposDaLinha) == "SPACE") {
+                            
+                            if (get<1>(camposDaLinha).find('+') != string::npos){
+                                string auxSpace = get<1>(camposDaLinha);
+                                auxSpace.substr(auxSpace.find('+') + 1, auxSpace.size());
+                                for (int i = 0; i < stoi(auxSpace); i++) {
+                                    codigoMaquina.emplace_back(make_tuple((get<1>(camposDaLinha),"00")));
+                                    contador++;
+                                }
+                            }
+                            else {
+                                codigoMaquina.emplace_back(make_tuple((get<1>(camposDaLinha),"00")));
+                                contador++;
+                            }
+                        }
+                        else {
+                            codigoMaquina.emplace_back(make_tuple((get<1>(camposDaLinha),get<2>(camposDaLinha))));
+                            contador++;
+                        }
+                    }
+                }
+            }
+        }
+        else {
+            if (IsInstrucao(get<1>(camposDaLinha))) {
+                codigoMaquina.emplace_back(
+                                            make_tuple(
+                                                        
+                                                        get<1>(camposDaLinha),
+                                                        ResolveInstrucao(
+                                                                            get<1>(camposDaLinha),
+                                                                            get<2>(camposDaLinha),
+                                                                            contador
+                                                                        )
+                                                    )
+                                        );
+                // Verifica se é COPY, para incrementar o contador em 3 caso seja
+                if(get<1>(camposDaLinha) == "COPY") {
+                    contador += 3;
+                }
+                // Verifica se é STOP, para incrementar o contador em 1 caso seja
+                else if (get<1>(camposDaLinha) == "STOP") {
+                    contador += 1;
+                }
+                // Para todas as outras instrucoes, incrementa o contador em 2
+                else {
+                    contador += 2;
+                }
+            }
+            else {
+                if (get<1>(camposDaLinha) == "SPACE") {
+                    
+                    if (get<2>(camposDaLinha).find('+') != string::npos){
+                        string auxSpace = get<2>(camposDaLinha);
+                        auxSpace.substr(auxSpace.find('+') + 1, auxSpace.size());
+                        for (int i = 0; i < stoi(auxSpace); i++) {
+                            codigoMaquina.emplace_back(make_tuple((get<1>(camposDaLinha),"00")));
+                            contador++;
+                        }
+                    }
+                    else {
+                        codigoMaquina.emplace_back(make_tuple((get<1>(camposDaLinha),"00")));
+                        contador++;
+                    }
+                }
+                else {
+                    codigoMaquina.emplace_back(make_tuple((get<1>(camposDaLinha),get<2>(camposDaLinha))));
+                    contador++;
+                }
+            }
+        }
+    }
+
+    for (auto& pendencia : tabelaDePendencias) {
+        int enderecoFinal = get<1>(pendencia.second);
+        list<string>& listaPendencias = get<2>(pendencia.second);
+        
+        // For each pending address that needs to be replaced
+        for (const string& enderecoPendente : listaPendencias) {
+            string enderecoFinal_str = ConverteIntEndereco(enderecoFinal);
+            
+            // Iterate through codigoMaquina and replace
+            for (auto& instrucao : codigoMaquina) {
+                string& operandos = get<1>(instrucao);
+                
+                if (get<0>(instrucao) == "COPY") {
+                    string operando1 = operandos.substr(0, operandos.find(" "));
+                    string operando2 = operandos.substr(operandos.find(" ") + 1);
+                    if (operando1 == enderecoPendente) {
+                        operando1 = enderecoFinal_str;
+                    }
+                    if (operando2 == enderecoPendente) {
+                        operando2 = enderecoFinal_str;
+                    }
+                    operandos = operando1 + " " + operando2;
+                }
+                else {
+                    if (operandos == enderecoPendente) {
+                        operandos = enderecoFinal_str;
+                    }
+                }
+            }
+        }
+    }
+
+    CriaArquivoSaida(codigoMaquina, nomeArquivo);
+
 }
+ 
