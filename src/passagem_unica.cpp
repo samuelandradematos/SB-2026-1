@@ -61,13 +61,7 @@ bool LabelNaTabela(string label) {
 void InsertPendencia(string label, string posicaoMemoria, bool definido = false) {
     list<string> posicaoPendencia;
     posicaoPendencia.emplace_front(posicaoMemoria);
-    tabelaDePendencias.emplace(label, make_tuple(definido, posicaoMemoria, posicaoPendencia));
-}
-
-void InsertSimbolo(string label, bool definido, int endereco) {
-    list<int> auxListEndereco;
-    auxListEndereco.emplace_front(endereco);
-    tabelaDePendencias.emplace(label,  make_tuple(definido,  endereco,  auxListEndereco));
+    tabelaDePendencias.emplace(make_pair(label, make_tuple(definido, posicaoMemoria, posicaoPendencia)));
 }
 
 string GetEndereco(string label) {
@@ -253,17 +247,21 @@ void Parser(string ArquivoIn) {
                                 string auxSpace = get<1>(camposDaLinha);
                                 auxSpace.substr(auxSpace.find('+') + 1, auxSpace.size());
                                 for (int i = 0; i < stoi(auxSpace); i++) {
-                                    codigoMaquina.emplace_back(make_tuple((get<1>(camposDaLinha),"00")));
+                                    string auxInstrucao = get<1>(camposDaLinha);
+                                    codigoMaquina.emplace_back(make_tuple(auxInstrucao,"00"));
                                     contador++;
                                 }
                             }
                             else {
-                                codigoMaquina.emplace_back(make_tuple((get<1>(camposDaLinha),"00")));
+                                string auxInstrucao = get<1>(camposDaLinha);
+                                codigoMaquina.emplace_back(make_tuple(auxInstrucao,"00"));
                                 contador++;
                             }
                         }
                         else {
-                            codigoMaquina.emplace_back(make_tuple((get<1>(camposDaLinha),get<2>(camposDaLinha))));
+                            string auxInstrucao = get<1>(camposDaLinha);
+                            string auxOperandos = get<2>(camposDaLinha);
+                            codigoMaquina.emplace_back(make_tuple(auxInstrucao, auxOperandos));
                             contador++;
                         }
                     }

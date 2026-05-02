@@ -11,6 +11,7 @@ int main(int argc, char* argv[]){
             string nomeArquivoSaida = argv[1];
             nomeArquivoSaida.replace(nomeArquivoSaida.find(".pre"), strlen(".pre"), "");
             Parser(nomeArquivoSaida);
+            //Chamadas para pre-processamento
         }
         if (get<1>(validaChamada) == "asm"){
             //Chamadas para pre-processamento
