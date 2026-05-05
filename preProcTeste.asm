@@ -1,5 +1,11 @@
    ; comentário de teste no topo
-    section     text
+SECTION DATA
+DOIS:       
+    CONST 2
+OLD_DATA: SPACE
+NEW_DATA: SPACE
+TMP_DATA: SPACE
+section     text
 TAM    : EQU 10
 ZERO: EQU 0
 IF TAM
@@ -11,6 +17,7 @@ L2   :
 L3:     
     DIV DOIS ;comentário de teste aqui
 STORE  NEW_DATA
+DEZ: CONST TAM
 MULT DOIS
 STORE TMP_DATA
     LOAD         OLD_DATA   
@@ -21,10 +28,4 @@ COPY NEW_DATA, OLD_DATA
 LOAD OLD_DATA
 JMPP L1
 STOP
-SECTION DATA
-DOIS:       
-    CONST TAM
-OLD_DATA: SPACE
-NEW_DATA: SPACE
-TMP_DATA: SPACE
 ; comentário de teste no fim

@@ -19,6 +19,10 @@ int main(int argc, char *argv[])
     std::string rotuloIsolado = "";
     std::map<std::string, std::string> tabelaEQU; // dicionário com nome da EQU e valor
     bool pularProximaLinha = false;               // controla a parte do IF
+    std::vector<std::string> secaoText;
+    std::vector<std::string> secaoData;
+
+    bool emData = false;
 
     if (!isArquivoASM(nomeArquivo))
     {
@@ -39,7 +43,8 @@ int main(int argc, char *argv[])
     while (getline(arquivo, linha))
     {
         // 0. verifica se deve pular a linha (caso valor de 0 do IF na linha anterior)
-        if (pularProximaLinha){
+        if (pularProximaLinha)
+        {
             pularProximaLinha = false;
             continue;
         }
@@ -64,7 +69,14 @@ int main(int argc, char *argv[])
             if (!rotuloIsolado.empty())
             {
                 // se já tem rótulo, escreve uma linha com rótulo o anterior
-                arquivoPreGerado << rotuloIsolado << std::endl;
+                if (emData)
+                {
+                    secaoData.push_back(rotuloIsolado);
+                }
+                else
+                {
+                    secaoText.push_back(rotuloIsolado);
+                }
             }
             rotuloIsolado = linha; // guarda o atual
             continue;
@@ -90,7 +102,56 @@ int main(int argc, char *argv[])
         // 6. substituir EQU
         linha = substituirEQU(linha, tabelaEQU);
 
-        arquivoPreGerado << linha << std::endl;
+        // 7. Verificar se é secao TEXT ou DATA para manter DATA no fim
+        if (linha == "SECTION DATA")
+        {
+            emData = true;
+            continue;
+        }
+
+        if (linha == "SECTION TEXT")
+        {
+            emData = false;
+            continue;
+        }
+
+        if (emData)
+        {
+            secaoData.push_back(linha);
+        }
+        else
+        {
+            secaoText.push_back(linha);
+        }
+    }
+
+    // gambi: caso a ultima linha seja um rótulo isolado, salva ele
+    if (!rotuloIsolado.empty())
+    {
+        if (emData)
+        {
+            secaoData.push_back(rotuloIsolado);
+        }
+        else
+        {
+            secaoText.push_back(rotuloIsolado);
+        }
+    }
+
+    // Escreve toda a secao text primeiro
+    arquivoPreGerado << "SECTION TEXT" << std::endl;
+
+    for (const auto &l : secaoText)
+    {
+        arquivoPreGerado << l << std::endl;
+    }
+
+    // escreve toda a secao data dps
+    arquivoPreGerado << "SECTION DATA" << std::endl;
+
+    for (const auto &l : secaoData)
+    {
+        arquivoPreGerado << l << std::endl;
     }
 
     arquivo.close();
