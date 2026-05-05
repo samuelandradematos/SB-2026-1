@@ -1,20 +1,49 @@
+#ifndef PASSAGEM_UNICA_HPP
+#define PASSAGEM_UNICA_HPP
 #include <instrucoes.hpp>
 #include <fstream>
+#include <cstring>
+#include <regex>
 
-unordered_map<string, tuple<bool, int, list<int>>> tabelaDePendencias;
+class TabelaDeSimbolos
+{
+    private:
+        TabelaDeSimbolos();
+        ~TabelaDeSimbolos();
+        static TabelaDeSimbolos* instance;   
+    public:
+        map<string, tuple<bool, int, list<string>>> tabelaDePendencias;
+        static TabelaDeSimbolos& GetInstance();
+        bool LabelDefinido(string label);
+        bool LabelNaTabela(string label);
+        void UpdateListaPendencias(string label, string endereco);
+        string GetEndereco(string label);
+        void InsertSimbolo(string label, string posicaoMemoria, bool definido);
+        void UpdateLabelDefinido(string label, int endereco);
+        void PrintTabelaDePendencias();
+};
+
+//unordered_map<string, tuple<bool, int, list<string>>> tabelaDePendencias;
 
 bool IsInstrucao(string);
 bool IsDiretiva(string);
 string GetOpcodeInstrucao(string);
 int GetQuantidadeOperandosInstrucao(string);
 int GetQuantidadeOperandosDiretiva(string);
-void InsertPendencia(string,  int,  bool);
-void UpdateListaPendencias(string label,  int posicaoMemoria);
+void InsertPendencia(string,  string,  bool);
+void UpdateListaPendencias(string,  string);
 bool LabelDefinido(string);
 void PrintTabelaDePendencias();
-tuple<string, int> resolveInstrucao(string, string);
+string ResolveInstrucao(string, string, int);
 void InsertSimbolo(string, bool, int);
 void TraduzOpcode(string, string);
-int GetEndereco(string);
+string GetEndereco(string);
+string ConverteIntEndereco(int);
+void UpdateLabelDefinido(string);
+bool LabelNaTabela(string);
 bool LabelDefinido(string);
-void Parser(string);
+tuple<string,string,string> getConteudoLinha(string);
+void Parser(string, string);
+void CriaArquivoSaida(list<tuple<int,tuple<string,string>>>, string);
+
+#endif
