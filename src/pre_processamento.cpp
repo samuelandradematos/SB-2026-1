@@ -131,3 +131,36 @@ std::string substituirEQU(const std::string &linha,
 
     return resultado;
 }
+
+bool treatIF(const std::string& linha,
+              const std::map<std::string, std::string>& tabelaEQU,
+              bool& pularProximaLinha) {
+    
+    std::stringstream ss(linha);
+    std::vector<std::string> tokens;
+    std::string token;
+
+    while (ss >> token) {
+        tokens.push_back(token);
+    }
+
+    if (tokens.size() >= 2 && tokens[0] == "IF") {
+        std::string arg = tokens[1];
+        int valor = 0;
+
+        if (tabelaEQU.count(arg)) {
+            valor = std::stoi(tabelaEQU.at(arg));
+        } else {
+            valor = std::stoi(arg);
+        }
+
+        if (valor == 0) {
+            pularProximaLinha = true;
+        }
+
+        // se retorna true é pq tinha IF
+        return true;
+    }
+
+    return false;
+}

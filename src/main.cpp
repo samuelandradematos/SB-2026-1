@@ -18,6 +18,7 @@ int main(int argc, char *argv[])
     std::ofstream arquivoPreGerado(nomeArquivoPreGerado);
     std::string rotuloIsolado = "";
     std::map<std::string, std::string> tabelaEQU; // dicionário com nome da EQU e valor
+    bool pularProximaLinha = false;               // controla a parte do IF
 
     if (!isArquivoASM(nomeArquivo))
     {
@@ -37,6 +38,11 @@ int main(int argc, char *argv[])
     std::string linha;
     while (getline(arquivo, linha))
     {
+        // 0. verifica se deve pular a linha (caso valor de 0 do IF na linha anterior)
+        if (pularProximaLinha){
+            pularProximaLinha = false;
+            continue;
+        }
 
         // 1. Remover comentários
         linha = removeComments(linha);
@@ -71,10 +77,17 @@ int main(int argc, char *argv[])
             rotuloIsolado.clear();
         }
 
-        // 4. Verifica se tem diretiva EQU e substituir
+        // 4. Trata a diretiva EQU
         // se o armazenamento tiver sucesso, segue, nao escreve a linha no arquivo
-        if (storeEQUs(linha, tabelaEQU)) continue;
-        
+        if (storeEQUs(linha, tabelaEQU))
+            continue;
+
+        // 5. Trata IFs
+        // se for IF, a flag de pular a proxima linha fica true, pq deve ser ignorada
+        if (treatIF(linha, tabelaEQU, pularProximaLinha))
+            continue;
+
+        // 6. substituir EQU
         linha = substituirEQU(linha, tabelaEQU);
 
         arquivoPreGerado << linha << std::endl;
@@ -83,6 +96,5 @@ int main(int argc, char *argv[])
     arquivo.close();
     arquivoPreGerado.close();
 
-    
     return 0;
 }

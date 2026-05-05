@@ -15,4 +15,7 @@ std::string removeUnnecessarySpaces(const std::string &str);
 bool storeEQUs(const std::string &linha, std::map<std::string, std::string> &tabelaEQU);
 std::string substituirEQU(const std::string &linha,
                           const std::map<std::string, std::string> &tabelaEQU);
+bool treatIF(const std::string &linha,
+             const std::map<std::string, std::string> &tabelaEQU,
+             bool &pularProximaLinha);
 #endif

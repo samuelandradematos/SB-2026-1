@@ -1,8 +1,11 @@
    ; comentário de teste no topo
     section     text
 TAM    : EQU 10
-INPUT  OLD_DATA
+ZERO: EQU 0
+IF TAM
 LOAD OLD_DATA
+IF ZERO
+INPUT  OLD_DATA
 L1      :
 L2   :
 L3:     
