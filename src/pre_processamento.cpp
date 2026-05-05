@@ -27,7 +27,6 @@ std::string removeComments(std::string linha)
     return linha;
 }
 
-// TODO: Essa func tbm precisa remover espacos entre LABEL e :
 std::string removeUnnecessarySpaces(const std::string &str)
 {
     std::string resultado;

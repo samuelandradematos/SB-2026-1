@@ -3,12 +3,14 @@
 
 #include <algorithm>
 #include <sstream>
+#include <fstream>
+#include <iostream>
 #include <string>
 #include <cctype>
 #include <vector>
 #include <map>
 
-bool isArquivoASM(const std::string &nome); // TODO: Mudar nome
+bool isArquivoASM(const std::string &nome); 
 std::string toUpperCase(std::string linha);
 std::string removeComments(std::string linha);
 std::string removeUnnecessarySpaces(const std::string &str);
@@ -18,4 +20,5 @@ std::string substituirEQU(const std::string &linha,
 bool treatIF(const std::string &linha,
              const std::map<std::string, std::string> &tabelaEQU,
              bool &pularProximaLinha);
+void preProcessar(const std::string &nomeArquivo);
 #endif
