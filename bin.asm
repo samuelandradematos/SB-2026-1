@@ -1,8 +1,7 @@
-; comentário de teste no topo
-section text
+SECTION TEXT
 INPUT OLD_DATA
 LOAD OLD_DATA
-L1: DIV DOIS ;comentário de teste aqui
+L1: DIV DOIS
 STORE  NEW_DATA
 MULT DOIS
 STORE TMP_DATA
@@ -19,4 +18,3 @@ DOIS: CONST 2
 OLD_DATA: SPACE
 NEW_DATA: SPACE
 TMP_DATA: SPACE
-; comentário de teste no fim
