@@ -2,7 +2,7 @@
 Trabalhos de SB 2026-1, professor Bruno
 
 ## Compilar o código
-```
+```bash
 g++ src/*.cpp -Iinclude -o montador
 ```
 ## Rodar as etapas:
