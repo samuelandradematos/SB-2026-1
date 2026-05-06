@@ -292,25 +292,29 @@ void CriaArquivoSaida(list<tuple<string,string>> codigo, string nomeArquivo, str
 	}
 
 	if (extensao == "pen") {
+		string auxOutput = "";
 		for (auto& instrucao : codigo) {
 			if (Instrucoes::GetInstance().IsInstrucao(get<0>(instrucao))) {
 				if (Instrucoes::GetInstance().IsStop(get<0>(instrucao))) {
-					saida << GetOpcodeInstrucao(get<0>(instrucao)) << " ";
+					auxOutput += GetOpcodeInstrucao(get<0>(instrucao)) + " ";
 					continue;
 				}
 				else {
-					saida << GetOpcodeInstrucao(get<0>(instrucao)) << " " << get<1>(instrucao) << " ";
+					auxOutput += GetOpcodeInstrucao(get<0>(instrucao)) + " " + get<1>(instrucao) + " ";
 				}
 			}
 			else {
-				saida << get<1>(instrucao) << " ";
+				auxOutput += get<1>(instrucao) + " ";
 			}
 		}
+		auxOutput = auxOutput.substr(0, auxOutput.size() - 1);
+		saida << auxOutput;
 
 		saida << endl << endl << endl;
 
 		saida << CriaStringCentralizadaComPreenchimento("Tabela de Símbolos", ' ', (COLUNA_PEQUENA * 3) + COLUNA_GRANDE) << endl;
-
+		
+		auxOutput = "";
 		string label = "Label";
 		string definido = "Definido";
 		string enderecoReal = "Endereço Real";
@@ -319,7 +323,6 @@ void CriaArquivoSaida(list<tuple<string,string>> codigo, string nomeArquivo, str
 		saida << CriaStringCentralizadaComPreenchimento(definido, ' ', COLUNA_PEQUENA) << "|";
 		saida << CriaStringCentralizadaComPreenchimento(enderecoReal, ' ', COLUNA_PEQUENA) << "|";
 		saida << CriaStringCentralizadaComPreenchimento(pendencias, ' ', COLUNA_GRANDE) << endl;
-		string auxOutput = "";
 		string auxListaPendencias = "";
 		for (auto& it: tabela.tabelaDePendencias) {
 			if (regex_match(it.first, regex("^[A-Z]{1}[A-Z0-9_]*$"))) {

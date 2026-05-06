@@ -42,75 +42,61 @@ bool Opcodes::IsOpcode(string instrucao)
 		return false;
 }
 
-list<tuple<string, string>> GetListOpcodeOperandos(string codigo) {
-	list<tuple<string, string>> codigoMaquina;
-	string auxCodigo = codigo;
-	string auxOpcode, auxOperando1, auxOperando2;
+Simulador& Simulador::GetInstance() {
+	if (instance == nullptr){
+		instance = new Simulador();
+	}
+	return *instance;
+}
 
-	//Exemplo de loop
-	// 12	01	10	03	04	05	11	07	03	09	11	11	10	13	02	15	11	17	13	19	09	21 22	10	24	07	4	14	2	00	00	00	
-	// 0:	auxOpcode
+Simulador::~Simulador()
+{
+	delete instance;
+}
+
+string Simulador::GetConteudoMemoria(string endereco)
+{
+	if (memoria.find(endereco) != memoria.end())
+	{
+		return memoria.find(endereco)->second;
+	}
+}
+
+void Simulador::SetConteudoMemoria(string endereco, int valor) {
+	if (memoria.find(endereco) != memoria.end())
+		memoria.find(endereco)->second = valor;
+}
 
 
 
-
-	while (auxCodigo.find("	") != string::npos) {
-		auxOpcode = auxCodigo.substr(0, auxCodigo.find("	"));
-		if (Opcodes::GetInstance().IsOpcode(auxOpcode)) {
-			auxCodigo = auxCodigo.substr(auxCodigo.find("	") + 1, auxCodigo.size());
-			if (auxOpcode == "09") {
-				auxOperando1 = auxCodigo.substr(0,auxCodigo.find("	"));
-				auxCodigo = auxCodigo.substr(auxCodigo.find("	") + 1, auxCodigo.size());
-				auxOperando2 = auxCodigo.substr(0,auxCodigo.find("	"));
-
-
+void Simulador::Start(string codigo) {
+	string opcode, operando1, operando2, aux;
+	int posicao = 0;
+	while (codigo.find(" ") != string::npos) {
+		opcode = codigo.substr(0, codigo.find(" "));
+		codigo = codigo.substr(codigo.find(" ") + 1, codigo.size());
+		if (opcode == "14") {
+			posicao++;
+			while (codigo.find(" ") != string::npos) {
+				aux = codigo.substr(0,codigo.find(" "));
+				memoria.emplace(ConverteIntEndereco(posicao),aux);
+				codigo.substr(codigo.find(" ") + 1, codigo.size());
+				posicao++;
 			}
 		}
-			
-		
-	}
-	return codigoMaquina;
-}
-
-string GetConteudoMemoria(string endereco, list<tuple<string, string>> codigo) {
-	for (const auto& it : codigo) {
-		if (get<1>(it) == endereco) {
-			return get<0>(it);
+		else if (opcode == "09") {
+			operando1 = codigo.substr(0, codigo.find(" "));
+			codigo.substr(codigo.find(" ") + 1, codigo.size());
+			operando2 = codigo.substr(0, codigo.find(" "));
+			codigo.substr(codigo.find(" ") + 1, codigo.size());
+			tabelaOperacaoOperandos.emplace_back(make_tuple(opcode, operando1, operando2));
+			posicao += 3;
+		}
+		else {
+			operando1 = codigo.substr(0, codigo.find(" "));
+			codigo.substr(codigo.find(" ") + 1, codigo.size());
+			tabelaOperacaoOperandos.emplace_back(make_tuple(opcode,operando1));
+			posicao += 2;
 		}
 	}
-	return "00";
-}
-
-string Opcodes::GetOpcode(string instrucao)
-{
-	return opcode[instrucao];
-}
-
-void Run(string arquivo) {
-	// fstream arquivoEntrada;
-	// arquivoEntrada.open(arquivo, ios::in);
-	// string linha;
-	// list<tuple<string, string>> operacaoOperando = list<tuple<string, string>>();
-	// string memoria;
-	// if (arquivoEntrada.is_open()) {
-	// while (getline(arquivoEntrada, linha)) {
-	// 		if (!linha.empty()) {
-	// 			operacaoOperando = GetListOpcodeOperandos(linha);
-	// 		}
-	// 	}
-	// }
-
-	// for (auto& it : operacaoOperando) {
-	// 	string opcode = Opcodes::GetInstance().GetOpcode(get<0>(it));
-	// 	if (opcode == "14") {
-	// 		break;
-	// 		// STOP
-	// 	}
-	// 	else {
-	// 		if (opcode == "01") {
-				
-	// 		}
-	// 	}
-	// }
-
 }
