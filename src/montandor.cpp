@@ -7,15 +7,15 @@ int main(int argc, char* argv[]){
     tuple<bool,string> validaChamada = ChamadaValida(argc, argv);
 
     if (get<0>(validaChamada)) {
+        // Algoritimo de passagem única
         if (get<1>(validaChamada) == "pre"){
-            string nomeArquivoSaida = argv[1];
-            nomeArquivoSaida.replace(nomeArquivoSaida.find(".pre"), strlen(".pre"), "");
-            Parser(nomeArquivoSaida, "pre");
-            //Chamadas para passagem única e criação de arquivos de saída .obj e .pen
+            Parser(argv[1]);
         }
+        // Pré-processamento
         if (get<1>(validaChamada) == "asm"){
             preProcessar(argv[1]);
         }
+        // Simulador
         if (get<1>(validaChamada) == "obj"){
             //Chamadas para o simulador
         }

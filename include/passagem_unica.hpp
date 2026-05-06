@@ -43,7 +43,7 @@ void UpdateLabelDefinido(string);
 bool LabelNaTabela(string);
 bool LabelDefinido(string);
 tuple<string,string,string> getConteudoLinha(string);
-void Parser(string, string);
+void Parser(string);
 void CriaArquivoSaida(list<tuple<int,tuple<string,string>>>, string);
 
 #endif

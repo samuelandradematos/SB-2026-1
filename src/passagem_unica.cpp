@@ -211,15 +211,15 @@ tuple<string,string,string> getConteudoLinha(string linha) {
 	string label,opcode,operando;
 	int posProxSubString;
 
-	if (linha.find(":	") != string::npos) {
-		label = linha.substr(0,linha.find(":	"));
-		posProxSubString = linha.find(":	") + strlen(":	");
+	if (linha.find(": ") != string::npos) {
+		label = linha.substr(0,linha.find(": "));
+		posProxSubString = linha.find(": ") + strlen(": ");
 		linha = linha.substr(posProxSubString,linha.size());
 	}
 
-	if (linha.find("	") != string::npos) {
-		opcode = linha.substr(0, linha.find("	"));
-		operando = linha.substr(linha.find("	") + 1, linha.size());
+	if (linha.find(" ") != string::npos) {
+		opcode = linha.substr(0, linha.find(" "));
+		operando = linha.substr(linha.find(" ") + 1, linha.size());
 	}
 	else {
 		opcode = linha;
@@ -228,18 +228,45 @@ tuple<string,string,string> getConteudoLinha(string linha) {
 	return make_tuple(label,opcode,operando);
 }
 
-void ResolvePendencias(list<tuple<string,string>> codigo) {
+void ResolvePendencias(list<tuple<string,string>>& codigo) {
 	TabelaDeSimbolos& tabela = TabelaDeSimbolos::GetInstance();
+	int memoria;
+	cout << "Lista antes..." << endl;
+	for (auto& it : codigo) {
+		cout << "Opcode: " << get<0>(it) << " Memoria: " << get<1>(it) << endl;
+	}
 	
 	for (auto& it: tabela.tabelaDePendencias) {
 		for (auto& memoria : get<2>(tabela.tabelaDePendencias.find(it.first)->second)) {
 			for (auto& instrucao : codigo) {
-				if (get<1>(instrucao) == memoria) {
-					instrucao = make_tuple(get<0>(instrucao), ConverteIntEndereco(get<1>(tabela.tabelaDePendencias.find(it.first)->second)));
+				if (Instrucoes::GetInstance().IsCopy(get<0>(instrucao))){
+					string auxOperandos = get<1>(instrucao);
+					string Operando1 = auxOperandos.substr(0, auxOperandos.find(" "));
+					string Operando2 = auxOperandos.substr(auxOperandos.find(" ") + 1, auxOperandos.size());
+					if (Operando1 == memoria) {
+						Operando1 = ConverteIntEndereco(get<1>(tabela.tabelaDePendencias.find(it.first)->second));
+						instrucao = make_tuple(get<0>(instrucao), Operando1 + " " + Operando2);
+					}
+					if (Operando2 == memoria) {
+						Operando2 = ConverteIntEndereco(get<1>(tabela.tabelaDePendencias.find(it.first)->second));
+						instrucao = make_tuple(get<0>(instrucao), Operando1 + " " + Operando2);
+					}
+				}
+				else {
+					if(get<1>(instrucao) == memoria) {
+						instrucao = make_tuple(get<0>(instrucao), ConverteIntEndereco(get<1>(tabela.tabelaDePendencias.find(it.first)->second)));
+					}
 				}
 			}
 		}
 	}
+
+	cout << "Lista depois...." << endl;
+
+	for (auto& it : codigo) {
+		cout << "Opcode: " << get<0>(it) << " Memoria: " << get<1>(it) << endl;
+	}
+
 }
 
 void CriaArquivoSaida(list<tuple<string,string>> codigo, string nomeArquivo, string extensao) {
@@ -250,15 +277,15 @@ void CriaArquivoSaida(list<tuple<string,string>> codigo, string nomeArquivo, str
 		for (auto& instrucao : codigo) {
 			if (Instrucoes::GetInstance().IsInstrucao(get<0>(instrucao))) {
 				if (Instrucoes::GetInstance().IsStop(get<0>(instrucao))) {
-					saida << GetOpcodeInstrucao(get<0>(instrucao)) << "	";
+					saida << GetOpcodeInstrucao(get<0>(instrucao)) << " ";
 					continue;
 				}
 				else {
-				saida << GetOpcodeInstrucao(get<0>(instrucao)) << "	" << get<1>(instrucao) << "	";
+				saida << GetOpcodeInstrucao(get<0>(instrucao)) << " " << get<1>(instrucao) << " ";
 				}
 			}
 			else {
-				saida << get<1>(instrucao) << "	";
+				saida << get<1>(instrucao) << " ";
 			}
 		}
 		saida << endl;
@@ -268,15 +295,15 @@ void CriaArquivoSaida(list<tuple<string,string>> codigo, string nomeArquivo, str
 		for (auto& instrucao : codigo) {
 			if (Instrucoes::GetInstance().IsInstrucao(get<0>(instrucao))) {
 				if (Instrucoes::GetInstance().IsStop(get<0>(instrucao))) {
-					saida << GetOpcodeInstrucao(get<0>(instrucao)) << "	";
+					saida << GetOpcodeInstrucao(get<0>(instrucao)) << " ";
 					continue;
 				}
 				else {
-					saida << GetOpcodeInstrucao(get<0>(instrucao)) << "	" << get<1>(instrucao) << "	";
+					saida << GetOpcodeInstrucao(get<0>(instrucao)) << " " << get<1>(instrucao) << " ";
 				}
 			}
 			else {
-				saida << get<1>(instrucao) << "	";
+				saida << get<1>(instrucao) << " ";
 			}
 		}
 
@@ -323,10 +350,10 @@ void CriaArquivoSaida(list<tuple<string,string>> codigo, string nomeArquivo, str
 	}
 }
 
-void Parser(string ArquivoIn, string extensao) {       
-	fstream arquivo;
-	string auxArquivo = ArquivoIn + "." + extensao;
-	arquivo.open(auxArquivo, ios::in);
+void Parser(string ArquivoIn) {       
+	fstream arquivo;;
+	arquivo.open(ArquivoIn, ios::in);
+	string auxArquivoOut = ArquivoIn.substr(0, ArquivoIn.find("."));
 	list<tuple<string,string>> codigoMaquina = list<tuple<string,string>>();
 	string linha;
 	tuple<string,string,string> camposDaLinha = tuple<string,string,string>();
@@ -334,6 +361,9 @@ void Parser(string ArquivoIn, string extensao) {
 
 	if (arquivo.is_open()) {
 		while (getline(arquivo,linha)) {
+			if (linha == "SECTION TEXT" || linha == "SECTION DATA"){
+				continue;
+			}
 			camposDaLinha = getConteudoLinha(linha);
 			// Verifica se tem label na linha
 			if (!get<0>(camposDaLinha).empty()) {
@@ -477,7 +507,8 @@ void Parser(string ArquivoIn, string extensao) {
 		}
 	}
 
-	CriaArquivoSaida(codigoMaquina, ArquivoIn, "obj");
-	CriaArquivoSaida(codigoMaquina, ArquivoIn, "pen");
+	CriaArquivoSaida(codigoMaquina, auxArquivoOut, "pen");
+	ResolvePendencias(codigoMaquina);
+	CriaArquivoSaida(codigoMaquina, auxArquivoOut, "obj");
 }
  
