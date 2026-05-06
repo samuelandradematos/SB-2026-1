@@ -1,6 +1,7 @@
 #include <montador.hpp>
 #include <ostream>
 #include <passagem_unica.hpp>
+#include <pre_processamento.hpp>
 
 int main(int argc, char* argv[]){
     tuple<bool,string> validaChamada = ChamadaValida(argc, argv);
@@ -13,7 +14,7 @@ int main(int argc, char* argv[]){
             //Chamadas para passagem única e criação de arquivos de saída .obj e .pen
         }
         if (get<1>(validaChamada) == "asm"){
-            //Chamadas para pre-processamento
+            preProcessar(argv[1]);
         }
         if (get<1>(validaChamada) == "obj"){
             //Chamadas para o simulador
