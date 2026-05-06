@@ -231,10 +231,6 @@ tuple<string,string,string> getConteudoLinha(string linha) {
 void ResolvePendencias(list<tuple<string,string>>& codigo) {
 	TabelaDeSimbolos& tabela = TabelaDeSimbolos::GetInstance();
 	int memoria;
-	cout << "Lista antes..." << endl;
-	for (auto& it : codigo) {
-		cout << "Opcode: " << get<0>(it) << " Memoria: " << get<1>(it) << endl;
-	}
 	
 	for (auto& it: tabela.tabelaDePendencias) {
 		for (auto& memoria : get<2>(tabela.tabelaDePendencias.find(it.first)->second)) {
@@ -260,13 +256,6 @@ void ResolvePendencias(list<tuple<string,string>>& codigo) {
 			}
 		}
 	}
-
-	cout << "Lista depois...." << endl;
-
-	for (auto& it : codigo) {
-		cout << "Opcode: " << get<0>(it) << " Memoria: " << get<1>(it) << endl;
-	}
-
 }
 
 void CriaArquivoSaida(list<tuple<string,string>> codigo, string nomeArquivo, string extensao) {
