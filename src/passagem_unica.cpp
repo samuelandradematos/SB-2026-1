@@ -272,27 +272,9 @@ void ResolvePendencias(list<tuple<string,string>>& codigo) {
 void CriaArquivoSaida(list<tuple<string,string>> codigo, string nomeArquivo, string extensao) {
 	ofstream saida(nomeArquivo + "." + extensao);
 	TabelaDeSimbolos& tabela = TabelaDeSimbolos::GetInstance();
+	string auxOutput = "";
 
 	if (extensao == "obj") {
-		for (auto& instrucao : codigo) {
-			if (Instrucoes::GetInstance().IsInstrucao(get<0>(instrucao))) {
-				if (Instrucoes::GetInstance().IsStop(get<0>(instrucao))) {
-					saida << GetOpcodeInstrucao(get<0>(instrucao)) << " ";
-					continue;
-				}
-				else {
-				saida << GetOpcodeInstrucao(get<0>(instrucao)) << " " << get<1>(instrucao) << " ";
-				}
-			}
-			else {
-				saida << get<1>(instrucao) << " ";
-			}
-		}
-		saida << endl;
-	}
-
-	if (extensao == "pen") {
-		string auxOutput = "";
 		for (auto& instrucao : codigo) {
 			if (Instrucoes::GetInstance().IsInstrucao(get<0>(instrucao))) {
 				if (Instrucoes::GetInstance().IsStop(get<0>(instrucao))) {
@@ -308,6 +290,26 @@ void CriaArquivoSaida(list<tuple<string,string>> codigo, string nomeArquivo, str
 			}
 		}
 		auxOutput = auxOutput.substr(0, auxOutput.size() - 1);
+		saida << auxOutput;
+	}
+
+	auxOutput = "";
+	if (extensao == "pen") {
+		for (auto& instrucao : codigo) {
+			if (Instrucoes::GetInstance().IsInstrucao(get<0>(instrucao))) {
+				if (Instrucoes::GetInstance().IsStop(get<0>(instrucao))) {
+					auxOutput += GetOpcodeInstrucao(get<0>(instrucao)) + " ";
+					continue;
+				}
+				else {
+					auxOutput += GetOpcodeInstrucao(get<0>(instrucao)) + " " + get<1>(instrucao) + " ";
+				}
+			}
+			else {
+				auxOutput += get<1>(instrucao) + " ";
+			}
+		}
+		auxOutput = auxOutput.substr(0, auxOutput.size() - 2);
 		saida << auxOutput;
 
 		saida << endl << endl << endl;

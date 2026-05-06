@@ -1,6 +1,7 @@
 #include <simualdor.hpp>
 
 Opcodes* Opcodes::instance = nullptr;
+Simulador* Simulador::instance = nullptr;
 
 Opcodes& Opcodes::GetInstance()
 {
@@ -49,6 +50,12 @@ Simulador& Simulador::GetInstance() {
 	return *instance;
 }
 
+Simulador::Simulador(){
+	acumulador = 0;
+	memoria = unordered_map<string,string>();
+	tabelaOperacaoOperandos = list<tuple<string,string,string>>();
+}
+
 Simulador::~Simulador()
 {
 	delete instance;
@@ -60,6 +67,8 @@ string Simulador::GetConteudoMemoria(string endereco)
 	{
 		return memoria.find(endereco)->second;
 	}
+	else 
+		return "";
 }
 
 void Simulador::SetConteudoMemoria(string endereco, int valor) {
@@ -80,22 +89,22 @@ void Simulador::Start(string codigo) {
 			while (codigo.find(" ") != string::npos) {
 				aux = codigo.substr(0,codigo.find(" "));
 				memoria.emplace(ConverteIntEndereco(posicao),aux);
-				codigo.substr(codigo.find(" ") + 1, codigo.size());
+				codigo = codigo.substr(codigo.find(" ") + 1, codigo.size());
 				posicao++;
 			}
 		}
 		else if (opcode == "09") {
 			operando1 = codigo.substr(0, codigo.find(" "));
-			codigo.substr(codigo.find(" ") + 1, codigo.size());
+			codigo = codigo.substr(codigo.find(" ") + 1, codigo.size());
 			operando2 = codigo.substr(0, codigo.find(" "));
-			codigo.substr(codigo.find(" ") + 1, codigo.size());
+			codigo = codigo.substr(codigo.find(" ") + 1, codigo.size());
 			tabelaOperacaoOperandos.emplace_back(make_tuple(opcode, operando1, operando2));
 			posicao += 3;
 		}
 		else {
 			operando1 = codigo.substr(0, codigo.find(" "));
-			codigo.substr(codigo.find(" ") + 1, codigo.size());
-			tabelaOperacaoOperandos.emplace_back(make_tuple(opcode,operando1));
+			codigo = codigo.substr(codigo.find(" ") + 1, codigo.size());
+			tabelaOperacaoOperandos.emplace_back(make_tuple(opcode,operando1,""));
 			posicao += 2;
 		}
 	}
