@@ -2,6 +2,7 @@
 #include <ostream>
 #include <passagem_unica.hpp>
 #include <pre_processamento.hpp>
+#include <simualdor.hpp>
 
 int main(int argc, char* argv[]){
     tuple<bool,string> validaChamada = ChamadaValida(argc, argv);
@@ -18,6 +19,7 @@ int main(int argc, char* argv[]){
         // Simulador
         if (get<1>(validaChamada) == "obj"){
             //Chamadas para o simulador
+            Simulador::GetInstance().Run(argv[1]);
         }
 
     }
@@ -36,8 +38,8 @@ tuple<bool,string> ChamadaValida(int argc, char* argv[]){
     else if (regex_search(argv[1],regex("(.asm)"))){
         return tuple(true, "asm");
     }
-    else if (regex_search(argv[1],regex("(.pen)"))){
-        return tuple(true, "pen");
+    else if (regex_search(argv[1],regex("(.obj)"))){
+        return tuple(true, "obj");
     }
     else{
         cout << "Erro no formato de arquivo: formatos permitidos - .asm | .pre | .pen" << endl;

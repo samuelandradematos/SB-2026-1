@@ -25,6 +25,7 @@ class Simulador
 		~Simulador();
 		static Simulador* instance;
 		int acumulador;
+		string programCounter;
 		unordered_map<string,string> memoria;
 		list<tuple<string,string,string>> tabelaOperacaoOperandos;
 	public:
@@ -32,6 +33,7 @@ class Simulador
 		string GetConteudoMemoria(string endereco);
 		void SetConteudoMemoria(string endereco, int valor);
 		void Start(string codigo);
+		void Run(string arquivo);
 };
 
 #endif

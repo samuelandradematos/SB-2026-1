@@ -173,6 +173,47 @@ bool treatIF(const std::string &linha,
     return false;
 }
 
+std::string treatCopy(std::string linha) {
+    std::string opcode, label, operandos;
+    std::string auxLinha;
+
+    if (linha.find(": ") != std::string::npos) {
+        label = linha.substr(0,linha.find(":") + 1);
+        linha = linha.substr(linha.find(":") + 2, linha.size());
+        opcode = linha.substr(0,linha.find(" "));
+        linha = linha.substr(linha.find(" ") + 1, linha.size());
+        operandos = "";
+        
+        for (auto& it : linha) {
+            if (it != ' ') {
+                operandos += it;
+            }
+        }
+        if (opcode != operandos)
+            auxLinha = label + " " + opcode + " " + operandos;
+        else
+            auxLinha = label + " " + opcode;
+        
+    }
+    else {
+        opcode = linha.substr(0,linha.find(" "));
+        linha = linha.substr(linha.find(" ") + 1, linha.size());
+        operandos = "";
+        for (auto& it : linha) {
+            if (it != ' ') {
+                operandos += it;
+            }
+        }
+        if (opcode != operandos) {
+            auxLinha = opcode + " " + operandos;
+        }
+        else 
+            auxLinha = opcode;
+    }
+
+    return auxLinha;
+}
+
 void preProcessar(const std::string &nomeArquivo)
 {
     std::ifstream arquivo(nomeArquivo);
@@ -217,6 +258,9 @@ void preProcessar(const std::string &nomeArquivo)
 
         // 2. Remover espacos desnecessário
         linha = removeUnnecessarySpaces(linha);
+
+        // 3. Remove espaços desnecessários entre os argumentos do COPY
+        linha = treatCopy(linha);
 
         // se depois de remover comentários e espacos a linha é vazia, só ignora ela
         if (linha.empty())

@@ -298,7 +298,7 @@ void CriaArquivoSaida(list<tuple<string,string>> codigo, string nomeArquivo, str
 				auxOutput += get<1>(instrucao) + " ";
 			}
 		}
-		auxOutput = auxOutput.substr(0, auxOutput.size() - 2);
+		auxOutput = auxOutput.substr(0, auxOutput.size() - 1);
 		saida << auxOutput;
 
 		saida << endl << endl << endl;
