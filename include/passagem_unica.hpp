@@ -5,6 +5,10 @@
 #include <cstring>
 #include <regex>
 
+#define COLUNA_GRANDE 50
+#define COLUNA_PEQUENA 20
+#define TAM_ENDERECO 3
+
 class TabelaDeSimbolos
 {
     private:

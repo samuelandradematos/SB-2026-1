@@ -1,7 +1,6 @@
 #include <passagem_unica.hpp>
 
-#define COLUNA_GRANDE 50
-#define COLUNA_PEQUENA 20
+
 
 TabelaDeSimbolos* TabelaDeSimbolos::instance = nullptr;
 TabelaDeSimbolos::~TabelaDeSimbolos(){};
@@ -95,15 +94,15 @@ void TabelaDeSimbolos::UpdateListaPendencias(string label, string endereco) {
 
 string ConverteIntEndereco(int posicao) {
 	string endereco = to_string(posicao);
-	if (endereco.length() < 4)
-		endereco.insert(0, 4 - endereco.length(), '0');
+	if (endereco.length() < TAM_ENDERECO)
+		endereco.insert(0, TAM_ENDERECO - endereco.length(), '0');
 	
 	return endereco;
 }
 
 string ConverteStringEndereco(string endereco) {
-	if (endereco.length() < 4)
-		endereco.insert(0, 4 - endereco.length(), '0');
+	if (endereco.length() < TAM_ENDERECO)
+		endereco.insert(0, TAM_ENDERECO - endereco.length(), '0');
 	
 	return endereco;
 }

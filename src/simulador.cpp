@@ -1,4 +1,5 @@
 #include <simualdor.hpp>
+#include <passagem_unica.hpp>
 
 Opcodes* Opcodes::instance = nullptr;
 Simulador* Simulador::instance = nullptr;
@@ -59,7 +60,10 @@ Simulador& Simulador::GetInstance() {
 
 Simulador::Simulador(){
 	acumulador = 0;
-	programCounter = "00";
+	programCounter = "";
+	for (int i = 0; i < TAM_ENDERECO; i++) {
+		programCounter += "0";
+	}
 	memoria = unordered_map<string,string>();
 	programa = map<string,tuple<string,string>>();
 	tabelaOperacaoOperandos = list<tuple<string,string,string>>();
