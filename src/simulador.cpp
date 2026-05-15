@@ -76,12 +76,16 @@ Simulador::~Simulador()
 
 string Simulador::GetConteudoMemoria(string endereco)
 {
-	if (memoria.find(endereco) != memoria.end())
+	unordered_map<string,string>::const_iterator it = memoria.find(endereco);
+	string aux;
+	if (it != memoria.end())
 	{
-		return memoria.find(endereco)->second;
+		aux = it->second;
+		return aux;
 	}
-	else 
+	else {
 		return "";
+	}
 }
 
 void Simulador::SetConteudoMemoria(string endereco, string valor) {
@@ -94,26 +98,21 @@ void Simulador::SetConteudoMemoria(string endereco, string valor) {
 void Simulador::Start(string codigo) {
 	string opcode, operando1, operando2, aux;
 	int posicao = 0;
-	cout << "Lendo codigo..." << endl;
 	while (codigo.find(" ") != string::npos) {
-		cout << "Codigo inicial: " << codigo << endl;
 		opcode = codigo.substr(0, codigo.find(" "));
 		codigo.erase(0, codigo.find(" ") + 1);
 		if (opcode == "14") {
+			programa.emplace(ConverteIntEndereco(posicao), make_tuple(opcode,""));
 			posicao++;
-			Simulador::GetInstance().programa.emplace(ConverteIntEndereco(posicao), make_tuple(opcode,""));
-			cout << "Construcao da memoria" << endl;
 			while (!codigo.empty()) {
 				if (codigo != "00") {
 					aux = codigo.substr(0,codigo.find(" "));
-					cout << "Posicaçao: " << ConverteIntEndereco(posicao) << " | Valor: " << aux << endl;
 					memoria.emplace(ConverteIntEndereco(posicao),aux);
 					codigo.erase(0, codigo.find(" ") + 1);
 					posicao++;
 				}
 				else {
 					memoria.emplace(ConverteIntEndereco(posicao),codigo);
-					cout << "Posicaçao: " << ConverteIntEndereco(posicao) << " | Valor: " << aux << endl;
 					posicao++;
 					codigo = "";
 				}
@@ -125,17 +124,16 @@ void Simulador::Start(string codigo) {
 			operando2 = codigo.substr(0, codigo.find(" "));
 			codigo.erase(0, codigo.find(" ") + 1);
 			tabelaOperacaoOperandos.emplace_back(make_tuple(opcode, operando1, operando2));
-			Simulador::GetInstance().programa.emplace(ConverteIntEndereco(posicao),make_tuple(opcode,operando1 + " " + operando2));
+			programa.emplace(ConverteIntEndereco(posicao),make_tuple(opcode,operando1 + " " + operando2));
 			posicao += 3;
 		}
 		else {
 			operando1 = codigo.substr(0, codigo.find(" "));
 			codigo.erase(0, codigo.find(" ") + 1);
 			tabelaOperacaoOperandos.emplace_back(make_tuple(opcode,operando1,""));
-			Simulador::GetInstance().programa.emplace(ConverteIntEndereco(posicao),make_tuple(opcode,operando1));
+			programa.emplace(ConverteIntEndereco(posicao),make_tuple(opcode,operando1));
 			posicao += 2;
 		}
-		cout << "Codigo restante: " << codigo << endl;
 	}
 }
 
@@ -148,77 +146,51 @@ void Simulador::Run(string arquivoOriginal) {
 	list<string> operandos = list<string>();
 	getline(arquivo,linha);
 	if (!linha.empty()) {
-		Simulador::GetInstance().Start(linha);
+		Start(linha);
 	}
-	
-	cout << "---------------------------------------------------" << endl;
-	cout << "Conteudo de programa" << endl;
-	for (auto& it: programa) {
-		cout << "Posição memória: " << it.first << " | Operação: " << get<0>(it.second) << " | Memória: " << get<1>(it.second) << endl;
-	}
-	cout << "---------------------------------------------------" << endl;
-	cout << "---------------------------------------------------" << endl;
-	cout << "Conteudo da memoria" << endl;
-	for (auto& it: memoria) {
-		cout << "Posicao memoria: " << it.first << " | Conteudo: " << it.second << endl;
-	}
-	cout << "---------------------------------------------------" << endl;
 
 	auxRun = linha;
 	while (programCounter != "STOP") {
-		cout << "PC: " << programCounter << endl;
-		cout << "Opcode: " << get<0>(programa.find(programCounter)->second) << endl;
 		auxOpcodeNum = stoi(get<0>(programa.find(programCounter)->second));
-		cout << "Opcode NUM: " << auxOpcodeNum << endl;
-
 
 		switch (auxOpcodeNum) {
 			case 1:
 				// ADD
 				auxOperando1 = get<1>(programa.find(programCounter)->second);
-				auxOperacao = stoi(GetConteudoMemoria(ConverteStringEndereco(auxOperando1)));
-				cout << "ADD|  Valor do acumulador: " << acumulador << " | Valor do conteudo de memória: " << auxOperacao << endl;
+				auxOperacao = stoi(GetConteudoMemoria(auxOperando1));
 				acumulador = acumulador + auxOperacao;
 				programCounter = ConverteIntEndereco(stoi(programCounter) + 2);
 				break;
 			case 2:
 				// SUB
 				auxOperando1 = get<1>(programa.find(programCounter)->second);
-				cout << "auxOperando1: " << auxOperando1 << endl;
-				auxOperacao = stoi(GetConteudoMemoria(ConverteStringEndereco(auxOperando1)));
-				cout << "SUB|  Valor do acumulador: " << acumulador << " | Valor do conteudo de memória: " << auxOperacao << endl;
-				acumulador = acumulador -auxOperacao;
-				cout << "Inc PC" << endl;				
+				auxOperacao = stoi(GetConteudoMemoria(auxOperando1));
+				acumulador = acumulador - auxOperacao;
 				programCounter = ConverteIntEndereco(stoi(programCounter) + 2);
-				cout << "Apos inc PC" << endl;
 				break;
 			case 3:
 				// MUL
 				auxOperando1 = get<1>(programa.find(programCounter)->second);
-				auxOperacao = stoi(GetConteudoMemoria(ConverteStringEndereco(auxOperando1)));
-				cout << "MUL|  Valor do acumulador: " << acumulador << " | Valor do conteudo de memória: " << GetConteudoMemoria(ConverteStringEndereco(auxOperando1)) << endl;
-				acumulador = acumulador * stoi(GetConteudoMemoria(ConverteStringEndereco(auxOperando1)));
+				auxOperacao = stoi(GetConteudoMemoria(auxOperando1));
+				acumulador = acumulador * auxOperacao;
 				programCounter = ConverteIntEndereco(stoi(programCounter) + 2);
 				break;
 			case 4:
 				// DIV
 				auxOperando1 = get<1>(programa.find(programCounter)->second);
-				auxOperacao = stoi(GetConteudoMemoria(ConverteStringEndereco(auxOperando1)));
-				cout << "DIV|  Valor do acumulador: " << acumulador << " | Valor do conteudo de memória: " << GetConteudoMemoria(ConverteStringEndereco(auxOperando1)) << endl;
-				acumulador = acumulador / stoi(GetConteudoMemoria(ConverteStringEndereco(auxOperando1)));
+				auxOperacao = stoi(GetConteudoMemoria(auxOperando1));
+				acumulador = acumulador / auxOperacao;
 				programCounter = ConverteIntEndereco(stoi(programCounter) + 2);
 				break;
 			case 5:
 				// JMP
 				auxOperando1 = get<1>(programa.find(programCounter)->second);
-				cout << "JMP|  Para o PC: " << GetConteudoMemoria(ConverteStringEndereco(auxOperando1)) << endl;
-				programCounter = ConverteStringEndereco(auxOperando1);
+				programCounter = auxOperando1;
 			case 6:
 				// JMPN
 				auxOperando1 = get<1>(programa.find(programCounter)->second);
 				if (acumulador < 0) {
-					cout << "JMPN|  Para o PC: " << GetConteudoMemoria(ConverteStringEndereco(auxOperando1)) << endl;
-					programCounter = ConverteStringEndereco(auxOperando1);
+					programCounter = auxOperando1;
 				}
 				else {
 					programCounter = ConverteIntEndereco(stoi(programCounter) + 2);
@@ -228,8 +200,7 @@ void Simulador::Run(string arquivoOriginal) {
 				// JMPP
 				auxOperando1 = get<1>(programa.find(programCounter)->second);
 				if (acumulador > 0) {
-					cout << "JMPP|  Para o PC: " << GetConteudoMemoria(ConverteStringEndereco(auxOperando1)) << endl;
-					programCounter = ConverteStringEndereco(auxOperando1);
+					programCounter = auxOperando1;
 				}
 				else {
 					programCounter = ConverteIntEndereco(stoi(programCounter) + 2);
@@ -239,8 +210,7 @@ void Simulador::Run(string arquivoOriginal) {
 				// JMPZ
 				auxOperando1 = get<1>(programa.find(programCounter)->second);
 				if (acumulador == 0) {
-					cout << "JMPZ|  Para o PC: " << GetConteudoMemoria(ConverteStringEndereco(auxOperando1)) << endl;
-					programCounter = ConverteStringEndereco(auxOperando1);
+					programCounter = auxOperando1;
 				}
 				else {
 					programCounter = ConverteIntEndereco(stoi(programCounter) + 2);
@@ -251,10 +221,8 @@ void Simulador::Run(string arquivoOriginal) {
 				auxCopy = get<1>(programa.find(programCounter)->second);
 				auxOperando1 = auxCopy.substr(0, auxCopy.find(" "));
 				auxOperando2 = auxCopy.substr(auxCopy.find(" ") + 1 , auxCopy.size());
-				auxCopy = GetConteudoMemoria(ConverteStringEndereco(auxOperando1));
-				cout << "COPY do endereço: " << auxOperando1 << " para o endereço: " << auxOperando2 << " o valor: " << auxCopy << endl;
-				it = memoria.find(ConverteStringEndereco(auxOperando2));
-				it->second = auxCopy;
+				auxCopy = GetConteudoMemoria(auxOperando1);
+				SetConteudoMemoria(auxOperando2, auxCopy);
 				programCounter = ConverteIntEndereco(stoi(programCounter) + 3);
 				break;
 			case 10:
@@ -266,16 +234,13 @@ void Simulador::Run(string arquivoOriginal) {
 			case 11:
 				// STORE
 				auxOperando1 = get<1>(programa.find(programCounter)->second);
-				cout << "STORE em: " << auxOperando1 << endl;
-				it = memoria.find(ConverteStringEndereco(auxOperando1));
-				it->second = acumulador;
+				SetConteudoMemoria(auxOperando1,to_string(acumulador));
 				programCounter = ConverteIntEndereco(stoi(programCounter) + 2);
 				break;
 			case 12:
 				// INPUT
 				auxOperando1 = get<1>(programa.find(programCounter)->second);
 				cin >> auxInput;
-				cout << "INPUT valor digitado: " << auxInput << endl;
 				SetConteudoMemoria(auxOperando1,auxInput);
 				programCounter = ConverteIntEndereco(stoi(programCounter) + 2);
 				break;
@@ -295,4 +260,6 @@ void Simulador::Run(string arquivoOriginal) {
 				break;
 		}
 	}
+
+	cout << endl;
 }
