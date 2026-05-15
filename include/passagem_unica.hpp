@@ -39,6 +39,7 @@ void InsertSimbolo(string, bool, int);
 void TraduzOpcode(string, string);
 string GetEndereco(string);
 string ConverteIntEndereco(int);
+string ConverteStringEndereco(string endereco);
 void UpdateLabelDefinido(string);
 bool LabelNaTabela(string);
 bool LabelDefinido(string);

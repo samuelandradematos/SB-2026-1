@@ -28,10 +28,11 @@ class Simulador
 		string programCounter;
 		unordered_map<string,string> memoria;
 		list<tuple<string,string,string>> tabelaOperacaoOperandos;
+		map<string,tuple<string,string>> programa;
 	public:
 		static Simulador& GetInstance();
 		string GetConteudoMemoria(string endereco);
-		void SetConteudoMemoria(string endereco, int valor);
+		void SetConteudoMemoria(string endereco, string valor);
 		void Start(string codigo);
 		void Run(string arquivo);
 };

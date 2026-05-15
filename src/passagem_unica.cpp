@@ -95,8 +95,15 @@ void TabelaDeSimbolos::UpdateListaPendencias(string label, string endereco) {
 
 string ConverteIntEndereco(int posicao) {
 	string endereco = to_string(posicao);
-	if (endereco.length() < 2)
-		endereco.insert(0, 2 - endereco.length(), '0');
+	if (endereco.length() < 4)
+		endereco.insert(0, 4 - endereco.length(), '0');
+	
+	return endereco;
+}
+
+string ConverteStringEndereco(string endereco) {
+	if (endereco.length() < 4)
+		endereco.insert(0, 4 - endereco.length(), '0');
 	
 	return endereco;
 }
@@ -169,7 +176,7 @@ string ResolveInstrucao(string opcode, string operando, int posicao) {
 				}
 			}
 		}
-			return auxRetorno;
+		return auxRetorno;
 	}
 	else {
 		if (Diretivas::GetInstance().IsDiretiva(opcode)) {
@@ -230,10 +237,11 @@ tuple<string,string,string> getConteudoLinha(string linha) {
 
 void ResolvePendencias(list<tuple<string,string>>& codigo) {
 	TabelaDeSimbolos& tabela = TabelaDeSimbolos::GetInstance();
-	int memoria;
 	
 	for (auto& it: tabela.tabelaDePendencias) {
+		cout << "Resolvendo Pendencias do Label: " << it.first << endl;
 		for (auto& memoria : get<2>(tabela.tabelaDePendencias.find(it.first)->second)) {
+			cout << "Pendencia: " << memoria << endl;
 			for (auto& instrucao : codigo) {
 				if (Instrucoes::GetInstance().IsCopy(get<0>(instrucao))){
 					string auxOperandos = get<1>(instrucao);
@@ -271,7 +279,10 @@ void CriaArquivoSaida(list<tuple<string,string>> codigo, string nomeArquivo, str
 					continue;
 				}
 				else {
-					auxOutput += GetOpcodeInstrucao(get<0>(instrucao)) + " " + get<1>(instrucao) + " ";
+					if (Instrucoes::GetInstance().IsCopy(get<0>(instrucao))) {
+						cout << "Copy | Operandos: " << get<1>(instrucao) << endl;
+					}
+					auxOutput += GetOpcodeInstrucao(get<0>(instrucao)) + " " + ConverteStringEndereco(get<1>(instrucao)) + " ";
 				}
 			}
 			else {
@@ -291,7 +302,7 @@ void CriaArquivoSaida(list<tuple<string,string>> codigo, string nomeArquivo, str
 					continue;
 				}
 				else {
-					auxOutput += GetOpcodeInstrucao(get<0>(instrucao)) + " " + get<1>(instrucao) + " ";
+					auxOutput += GetOpcodeInstrucao(get<0>(instrucao)) + " " + ConverteStringEndereco(get<1>(instrucao)) + " ";
 				}
 			}
 			else {
@@ -409,6 +420,7 @@ void Parser(string ArquivoIn) {
 					}
 					else {
 						// Como não está na tabela, insere na tabela de simbolos, com definido = true.
+						cout << "Inserindo o Label: " << get<0>(camposDaLinha) << " | Posição na memoria: " << ConverteIntEndereco(contador) << endl;
 						TabelaDeSimbolos::GetInstance().InsertSimbolo(get<0>(camposDaLinha),ConverteIntEndereco(contador),true);
 						// Verifica se o label é uma instrucao
 						if (Instrucoes::GetInstance().IsInstrucao(get<1>(camposDaLinha))) {
@@ -499,6 +511,10 @@ void Parser(string ArquivoIn) {
 				}
 			}
 		}
+	}
+
+	for (auto& it : codigoMaquina) {
+		cout << "Opcode: " << get<0>(it) << " | Operandos: " << get<1>(it) << endl;
 	}
 
 	CriaArquivoSaida(codigoMaquina, auxArquivoOut, "pen");
