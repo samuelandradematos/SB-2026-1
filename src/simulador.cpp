@@ -98,7 +98,7 @@ void Simulador::SetConteudoMemoria(string endereco, string valor) {
 void Simulador::Start(string codigo) {
 	string opcode, operando1, operando2, aux;
 	int posicao = 0;
-	while (codigo.find(" ") != string::npos) {
+	while (!codigo.empty()) {
 		opcode = codigo.substr(0, codigo.find(" "));
 		codigo.erase(0, codigo.find(" ") + 1);
 		if (opcode == "14") {
@@ -186,6 +186,7 @@ void Simulador::Run(string arquivoOriginal) {
 				// JMP
 				auxOperando1 = get<1>(programa.find(programCounter)->second);
 				programCounter = auxOperando1;
+				break;
 			case 6:
 				// JMPN
 				auxOperando1 = get<1>(programa.find(programCounter)->second);
