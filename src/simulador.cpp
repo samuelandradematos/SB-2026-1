@@ -264,7 +264,7 @@ void Simulador::Run(string arquivoOriginal)
 				// OUTPUT
 				auxOperando1 = get<1>(programa.find(programCounter)->second);
 				auxOutput = GetConteudoMemoria(auxOperando1);
-				cout << auxOutput;
+				cout << auxOutput << "\n";
 				programCounter = ConverteIntEndereco(stoi(programCounter) + 2);
 				break;
 			case 14:

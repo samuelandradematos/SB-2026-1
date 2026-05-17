@@ -8,7 +8,6 @@ int main(int argc, char* argv[]){
     tuple<bool,string> validaChamada = ChamadaValida(argc, argv);
 
     if (get<0>(validaChamada)) {
-        cout << get<1>(validaChamada) << endl;
         // Algoritimo de passagem única
         if (get<1>(validaChamada) == "pre"){
             Parser(argv[1]);
@@ -19,7 +18,6 @@ int main(int argc, char* argv[]){
         }
         // Simulador
         if (get<1>(validaChamada) == "obj"){
-            cout << "oiii" << endl;
             //Chamadas para o simulador
             Simulador::GetInstance().Run(argv[1]);
         }
