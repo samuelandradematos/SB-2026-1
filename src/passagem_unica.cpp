@@ -205,6 +205,14 @@ string ResolveInstrucao(string opcode, string operando, int posicao) {
 				else {
 					TabelaDeSimbolos::GetInstance().InsertSimbolo(operando, ConverteIntEndereco(posicao), true);
 				}
+
+				// Trata hexadecimal
+				if (operando.find("0x") == 0 || operando.find("0X") == 0)
+				{
+					int valorHex = stoi(operando, nullptr, 16);
+					return to_string(valorHex);
+				}
+
 				return operando;
 			}
 		}
