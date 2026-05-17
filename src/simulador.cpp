@@ -104,8 +104,7 @@ void Simulador::Start(string codigo)
 {
 	string opcode, operando1, operando2, aux;
 	int posicao = 0;
-	while (codigo.find(" ") != string::npos)
-	{
+	while (!codigo.empty()) {
 		opcode = codigo.substr(0, codigo.find(" "));
 		codigo.erase(0, codigo.find(" ") + 1);
 		if (opcode == "14")
@@ -169,122 +168,112 @@ void Simulador::Run(string arquivoOriginal)
 	{
 		auxOpcodeNum = stoi(get<0>(programa.find(programCounter)->second));
 
-		// cout << "PC: " << programCounter << endl;
-		// cout << "Opcode: " << auxOpcodeNum << endl;
-
-		switch (auxOpcodeNum)
-		{
-		case 1:
-			// ADD
-			auxOperando1 = get<1>(programa.find(programCounter)->second);
-			auxOperacao = stoi(GetConteudoMemoria(auxOperando1));
-			acumulador = acumulador + auxOperacao;
-			programCounter = ConverteIntEndereco(stoi(programCounter) + 2);
-			break;
-		case 2:
-			// SUB
-			auxOperando1 = get<1>(programa.find(programCounter)->second);
-			auxOperacao = stoi(GetConteudoMemoria(auxOperando1));
-			acumulador = acumulador - auxOperacao;
-			programCounter = ConverteIntEndereco(stoi(programCounter) + 2);
-			break;
-		case 3:
-			// MUL
-			auxOperando1 = get<1>(programa.find(programCounter)->second);
-			auxOperacao = stoi(GetConteudoMemoria(auxOperando1));
-			acumulador = acumulador * auxOperacao;
-			programCounter = ConverteIntEndereco(stoi(programCounter) + 2);
-			break;
-		case 4:
-			// DIV
-			auxOperando1 = get<1>(programa.find(programCounter)->second);
-			auxOperacao = stoi(GetConteudoMemoria(auxOperando1));
-			acumulador = acumulador / auxOperacao;
-			programCounter = ConverteIntEndereco(stoi(programCounter) + 2);
-			break;
-		case 5:
-			// JMP
-			auxOperando1 = get<1>(programa.find(programCounter)->second);
-			programCounter = auxOperando1;
-			break;
-		case 6:
-			// JMPN
-			auxOperando1 = get<1>(programa.find(programCounter)->second);
-			if (acumulador < 0)
-			{
-				programCounter = auxOperando1;
-			}
-			else
-			{
+		switch (auxOpcodeNum) {
+			case 1:
+				// ADD
+				auxOperando1 = get<1>(programa.find(programCounter)->second);
+				auxOperacao = stoi(GetConteudoMemoria(auxOperando1));
+				acumulador = acumulador + auxOperacao;
 				programCounter = ConverteIntEndereco(stoi(programCounter) + 2);
-			}
-			break;
-		case 7:
-			// JMPP
-			auxOperando1 = get<1>(programa.find(programCounter)->second);
-			if (acumulador > 0)
-			{
-				programCounter = auxOperando1;
-			}
-			else
-			{
+				break;
+			case 2:
+				// SUB
+				auxOperando1 = get<1>(programa.find(programCounter)->second);
+				auxOperacao = stoi(GetConteudoMemoria(auxOperando1));
+				acumulador = acumulador - auxOperacao;
 				programCounter = ConverteIntEndereco(stoi(programCounter) + 2);
-			}
-			break;
-		case 8:
-			// JMPZ
-			auxOperando1 = get<1>(programa.find(programCounter)->second);
-			if (acumulador == 0)
-			{
-				programCounter = auxOperando1;
-			}
-			else
-			{
+				break;
+			case 3:
+				// MUL
+				auxOperando1 = get<1>(programa.find(programCounter)->second);
+				auxOperacao = stoi(GetConteudoMemoria(auxOperando1));
+				acumulador = acumulador * auxOperacao;
 				programCounter = ConverteIntEndereco(stoi(programCounter) + 2);
-			}
-			break;
-		case 9:
-			// COPY
-			auxCopy = get<1>(programa.find(programCounter)->second);
-			auxOperando1 = auxCopy.substr(0, auxCopy.find(" "));
-			auxOperando2 = auxCopy.substr(auxCopy.find(" ") + 1, auxCopy.size());
-			auxCopy = GetConteudoMemoria(auxOperando1);
-			SetConteudoMemoria(auxOperando2, auxCopy);
-			programCounter = ConverteIntEndereco(stoi(programCounter) + 3);
-			break;
-		case 10:
-			// LOAD
-			auxOperando1 = GetConteudoMemoria(get<1>(programa.find(programCounter)->second));
-			acumulador = stoi(auxOperando1);
-			programCounter = ConverteIntEndereco(stoi(programCounter) + 2);
-			break;
-		case 11:
-			// STORE
-			auxOperando1 = get<1>(programa.find(programCounter)->second);
-			SetConteudoMemoria(auxOperando1, to_string(acumulador));
-			programCounter = ConverteIntEndereco(stoi(programCounter) + 2);
-			break;
-		case 12:
-			// INPUT
-			auxOperando1 = get<1>(programa.find(programCounter)->second);
-			cin >> auxInput;
-			SetConteudoMemoria(auxOperando1, auxInput);
-			programCounter = ConverteIntEndereco(stoi(programCounter) + 2);
-			break;
-		case 13:
-			// OUTPUT
-			auxOperando1 = get<1>(programa.find(programCounter)->second);
-			auxOutput = GetConteudoMemoria(auxOperando1);
-			cout << auxOutput << "\n";
-			programCounter = ConverteIntEndereco(stoi(programCounter) + 2);
-			break;
-		case 14:
-			// STOP
-			programCounter = "STOP";
-			break;
-		default:
-			programCounter = "STOP";
-			break;
+				break;
+			case 4:
+				// DIV
+				auxOperando1 = get<1>(programa.find(programCounter)->second);
+				auxOperacao = stoi(GetConteudoMemoria(auxOperando1));
+				acumulador = acumulador / auxOperacao;
+				programCounter = ConverteIntEndereco(stoi(programCounter) + 2);
+				break;
+			case 5:
+				// JMP
+				auxOperando1 = get<1>(programa.find(programCounter)->second);
+				programCounter = auxOperando1;
+				break;
+			case 6:
+				// JMPN
+				auxOperando1 = get<1>(programa.find(programCounter)->second);
+				if (acumulador < 0) {
+					programCounter = auxOperando1;
+				}
+				else {
+					programCounter = ConverteIntEndereco(stoi(programCounter) + 2);
+				}
+				break;
+			case 7:
+				// JMPP
+				auxOperando1 = get<1>(programa.find(programCounter)->second);
+				if (acumulador > 0) {
+					programCounter = auxOperando1;
+				}
+				else {
+					programCounter = ConverteIntEndereco(stoi(programCounter) + 2);
+				}
+				break;
+			case 8:
+				// JMPZ
+				auxOperando1 = get<1>(programa.find(programCounter)->second);
+				if (acumulador == 0) {
+					programCounter = auxOperando1;
+				}
+				else {
+					programCounter = ConverteIntEndereco(stoi(programCounter) + 2);
+				}
+				break;
+			case 9:
+				// COPY
+				auxCopy = get<1>(programa.find(programCounter)->second);
+				auxOperando1 = auxCopy.substr(0, auxCopy.find(" "));
+				auxOperando2 = auxCopy.substr(auxCopy.find(" ") + 1 , auxCopy.size());
+				auxCopy = GetConteudoMemoria(auxOperando1);
+				SetConteudoMemoria(auxOperando2, auxCopy);
+				programCounter = ConverteIntEndereco(stoi(programCounter) + 3);
+				break;
+			case 10:
+				// LOAD
+				auxOperando1 = GetConteudoMemoria(get<1>(programa.find(programCounter)->second));
+				acumulador = stoi(auxOperando1);
+				programCounter = ConverteIntEndereco(stoi(programCounter) + 2);
+				break;
+			case 11:
+				// STORE
+				auxOperando1 = get<1>(programa.find(programCounter)->second);
+				SetConteudoMemoria(auxOperando1,to_string(acumulador));
+				programCounter = ConverteIntEndereco(stoi(programCounter) + 2);
+				break;
+			case 12:
+				// INPUT
+				auxOperando1 = get<1>(programa.find(programCounter)->second);
+				cin >> auxInput;
+				SetConteudoMemoria(auxOperando1,auxInput);
+				programCounter = ConverteIntEndereco(stoi(programCounter) + 2);
+				break;
+			case 13:
+				// OUTPUT
+				auxOperando1 = get<1>(programa.find(programCounter)->second);
+				auxOutput = GetConteudoMemoria(auxOperando1);
+				cout << auxOutput;
+				programCounter = ConverteIntEndereco(stoi(programCounter) + 2);
+				break;
+			case 14:
+				// STOP
+				programCounter = "STOP";
+				break;
+			default:
+				programCounter = "STOP";
+				break;
 		}
 	}
 
