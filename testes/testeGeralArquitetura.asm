@@ -1,6 +1,7 @@
 ; O QUE FAZ:
 ; Testa o montador abrangendo todos os comandos
-; da arquitetura hipotética, incluindo EQU e IF
+; da arquitetura hipotética, incluindo EQU, IF
+; e CONST com decimal, negativo e hexadecimal.
 
 ; ==========================================
 ; TESTE EQU
@@ -20,11 +21,30 @@ SECTION DATA
 	METADE:    SPACE
 	COPIA:     SPACE
 
-	DOIS:      CONST DIVISOR
+	; ==========================================
+	; TESTE CONST
+	; ==========================================
 
-	ZERO:      CONST 0
-	UM:        CONST 1
-	MENOSUM:   CONST -1
+	DOIS:      CONST DIVISOR     ; EQU + decimal positivo
+	ZERO:      CONST 0           ; decimal zero
+	UM:        CONST 1           ; decimal positivo
+	MENOSUM:   CONST -1          ; decimal negativo
+
+	; ==========================================
+	; TESTES HEXADECIMAIS
+	; ==========================================
+
+	HEXA:      CONST 0x12        ; 18 decimal
+	HEXFF:     CONST 0XFF        ; 255 decimal
+	HEXAB:     CONST 0xAB        ; 171 decimal
+	HEXZERO:   CONST 0x0         ; 0 decimal
+
+	; ==========================================
+	; TESTES DECIMAIS EXTRAS
+	; ==========================================
+
+	POS:       CONST 25
+	NEG:       CONST -13
 
 SECTION TEXT
 
@@ -40,6 +60,18 @@ SECTION TEXT
 
     IF VALOR_TESTE
     OUTPUT UM
+
+    ; ==========================================
+    ; TESTES CONST
+    ; ==========================================
+
+    OUTPUT POS
+    OUTPUT NEG
+
+    OUTPUT HEXA
+    OUTPUT HEXFF
+    OUTPUT HEXAB
+    OUTPUT HEXZERO
 
     ; ==========================================
     ; TESTE LOAD / ADD / STORE
@@ -77,7 +109,7 @@ SECTION TEXT
     ; TESTE COPY
     ; ==========================================
 
-    COPY SOMA, COPIA
+    COPY SOMA  ,      COPIA
 
     ; ==========================================
     ; TESTE OUTPUT

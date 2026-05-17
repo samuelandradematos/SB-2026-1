@@ -112,7 +112,7 @@ string CriaStringCentralizadaComPreenchimento(string texto, char preenchimento, 
 		texto += preenchimento;
 	}
 	int tamanhoPreenchimento = (tamanho - texto.length()) / 2;
-	if (texto.length() < tamanho) {
+	if (texto.length() < (size_t)tamanho) {
 		texto.insert(0, tamanhoPreenchimento, preenchimento);
 		texto.insert(texto.length(), tamanhoPreenchimento, preenchimento);
 	}

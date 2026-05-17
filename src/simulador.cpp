@@ -102,51 +102,70 @@ void Simulador::SetConteudoMemoria(string endereco, string valor)
 
 void Simulador::Start(string codigo)
 {
-	string opcode, operando1, operando2, aux;
-	int posicao = 0;
-	while (!codigo.empty()) {
-		opcode = codigo.substr(0, codigo.find(" "));
-		codigo.erase(0, codigo.find(" ") + 1);
-		if (opcode == "14")
-		{
-			programa.emplace(ConverteIntEndereco(posicao), make_tuple(opcode, ""));
-			posicao++;
-			while (!codigo.empty())
-			{
-				if (codigo != "00")
-				{
-					aux = codigo.substr(0, codigo.find(" "));
-					memoria.emplace(ConverteIntEndereco(posicao), aux);
-					codigo.erase(0, codigo.find(" ") + 1);
-					posicao++;
-				}
-				else
-				{
-					memoria.emplace(ConverteIntEndereco(posicao), codigo);
-					posicao++;
-					codigo = "";
-				}
-			}
-		}
-		else if (opcode == "09")
-		{
-			operando1 = codigo.substr(0, codigo.find(" "));
-			codigo.erase(0, codigo.find(" ") + 1);
-			operando2 = codigo.substr(0, codigo.find(" "));
-			codigo.erase(0, codigo.find(" ") + 1);
-			tabelaOperacaoOperandos.emplace_back(make_tuple(opcode, operando1, operando2));
-			programa.emplace(ConverteIntEndereco(posicao), make_tuple(opcode, operando1 + " " + operando2));
-			posicao += 3;
-		}
-		else
-		{
-			operando1 = codigo.substr(0, codigo.find(" "));
-			codigo.erase(0, codigo.find(" ") + 1);
-			tabelaOperacaoOperandos.emplace_back(make_tuple(opcode, operando1, ""));
-			programa.emplace(ConverteIntEndereco(posicao), make_tuple(opcode, operando1));
-			posicao += 2;
-		}
-	}
+    string token;
+    vector<string> tokens;
+
+    std::stringstream ss(codigo);
+
+    while (ss >> token)
+    {
+        tokens.push_back(token);
+    }
+
+    size_t i = 0;
+    int posicao = 0;
+
+    while (i < tokens.size())
+    {
+        string opcode = tokens[i];
+
+        if (opcode == "14")
+        {
+            programa.emplace(
+                ConverteIntEndereco(posicao),
+                make_tuple(opcode, "")
+            );
+
+            posicao++;
+            i++;
+
+            while (i < tokens.size())
+            {
+                memoria.emplace(
+                    ConverteIntEndereco(posicao),
+                    tokens[i]
+                );
+
+                posicao++;
+                i++;
+            }
+        }
+        else if (opcode == "09")
+        {
+            string operando1 = tokens[i + 1];
+            string operando2 = tokens[i + 2];
+
+            programa.emplace(
+                ConverteIntEndereco(posicao),
+                make_tuple(opcode, operando1 + " " + operando2)
+            );
+
+            posicao += 3;
+            i += 3;
+        }
+        else
+        {
+            string operando1 = tokens[i + 1];
+
+            programa.emplace(
+                ConverteIntEndereco(posicao),
+                make_tuple(opcode, operando1)
+            );
+
+            posicao += 2;
+            i += 2;
+        }
+    }
 }
 
 void Simulador::Run(string arquivoOriginal)
@@ -155,7 +174,6 @@ void Simulador::Run(string arquivoOriginal)
 	arquivo.open(arquivoOriginal);
 	string linha, auxRun, auxOpcode, auxOperando1, auxOperando2, auxCopy, auxInput, auxOutput;
 	int auxOpcodeNum, auxOperacao;
-	unordered_map<string, string>::iterator it = memoria.begin();
 	list<string> operandos = list<string>();
 	getline(arquivo, linha);
 	if (!linha.empty())
@@ -276,6 +294,4 @@ void Simulador::Run(string arquivoOriginal)
 				break;
 		}
 	}
-
-	cout << endl;
 }
