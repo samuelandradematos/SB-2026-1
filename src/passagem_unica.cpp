@@ -246,9 +246,7 @@ void ResolvePendencias(list<tuple<string,string>>& codigo) {
 	TabelaDeSimbolos& tabela = TabelaDeSimbolos::GetInstance();
 	
 	for (auto& it: tabela.tabelaDePendencias) {
-		cout << "Resolvendo Pendencias do Label: " << it.first << endl;
 		for (auto& memoria : get<2>(tabela.tabelaDePendencias.find(it.first)->second)) {
-			cout << "Pendencia: " << memoria << endl;
 			for (auto& instrucao : codigo) {
 				if (Instrucoes::GetInstance().IsCopy(get<0>(instrucao))){
 					string auxOperandos = get<1>(instrucao);
@@ -286,9 +284,6 @@ void CriaArquivoSaida(list<tuple<string,string>> codigo, string nomeArquivo, str
 					continue;
 				}
 				else {
-					if (Instrucoes::GetInstance().IsCopy(get<0>(instrucao))) {
-						cout << "Copy | Operandos: " << get<1>(instrucao) << endl;
-					}
 					auxOutput += GetOpcodeInstrucao(get<0>(instrucao)) + " " + ConverteStringEndereco(get<1>(instrucao)) + " ";
 				}
 			}
@@ -427,7 +422,6 @@ void Parser(string ArquivoIn) {
 					}
 					else {
 						// Como não está na tabela, insere na tabela de simbolos, com definido = true.
-						cout << "Inserindo o Label: " << get<0>(camposDaLinha) << " | Posição na memoria: " << ConverteIntEndereco(contador) << endl;
 						TabelaDeSimbolos::GetInstance().InsertSimbolo(get<0>(camposDaLinha),ConverteIntEndereco(contador),true);
 						// Verifica se o label é uma instrucao
 						if (Instrucoes::GetInstance().IsInstrucao(get<1>(camposDaLinha))) {
@@ -518,10 +512,6 @@ void Parser(string ArquivoIn) {
 				}
 			}
 		}
-	}
-
-	for (auto& it : codigoMaquina) {
-		cout << "Opcode: " << get<0>(it) << " | Operandos: " << get<1>(it) << endl;
 	}
 
 	CriaArquivoSaida(codigoMaquina, auxArquivoOut, "pen");
