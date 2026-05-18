@@ -3,6 +3,7 @@
 #include <instrucoes.hpp>
 #include <passagem_unica.hpp>
 #include <fstream>
+#include <sstream>
 #include <list>
 
 class Opcodes
