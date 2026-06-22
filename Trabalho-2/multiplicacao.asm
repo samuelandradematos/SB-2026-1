@@ -19,9 +19,9 @@ multiplicacao:
     push tam_error_msg
     push error_msg
     call print_string
-    leave
     pop edx
     pop eax
+    leave
     mov eax, error_msg
     ret
 retorno:
