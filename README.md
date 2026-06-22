@@ -10,4 +10,5 @@ Linux
 
 # Conteúdo:
 Trabalho-1 -> Montandor para o assembly inventado feito em C++
+
 Trabalho-2 -> Calculadora feita em assembly IA32
