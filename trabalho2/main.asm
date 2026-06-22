@@ -34,6 +34,7 @@ _start:
 	call entrada_precisao
 	call executar_menu
 
+	; todo: remover isso depois que as opcoes do menu estiverem prontas
 	mov eax, 1 ; syscall sair
 	mov ebx, 0
 	int 0x80
@@ -190,7 +191,7 @@ remove_newline:
 
 
 executar_menu:
-
+.loop:
 	call mostrar_menu
 
 	push opcao_escolhida
@@ -202,7 +203,7 @@ executar_menu:
 	je sair
 	; cmp byte [precisao], '0'
 
-	ret
+	jmp .loop
 
 
 mostrar_menu:
