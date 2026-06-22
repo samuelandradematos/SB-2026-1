@@ -22,6 +22,7 @@ multiplicacao:
     leave
     pop edx
     pop eax
+    mov eax, error_msg
     ret
 retorno:
     pop edx
