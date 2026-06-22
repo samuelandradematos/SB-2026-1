@@ -20,8 +20,12 @@ MULTIPLICACAO:
     push error_msg
     call print_string
     leave
+    pop edx
+    pop eax
     ret
 RETORNO:
+    pop edx
+    pop eax
     leave
     ret
 
