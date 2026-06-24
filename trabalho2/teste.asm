@@ -199,6 +199,10 @@ executar_menu:
     add esp, 4
 	call remove_newline
 
+	cmp byte [opcao_escolhida], '1'
+	je soma
+
+
 	cmp byte [opcao_escolhida], '7'
 	je sair
 	; cmp byte [precisao], '0'
@@ -245,6 +249,14 @@ mostrar_menu:
 	mov esp, ebp
 	pop ebp
 	ret
+
+soma:
+	cmp byte [precisao], '0'
+	je ._16
+._32:
+
+._16:
+
 
 
 sair:
