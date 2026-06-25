@@ -19,11 +19,11 @@ multiplicacao:
     push tam_error_msg
     push error_msg
     call print_string
-    pop edx
-    pop eax
-    leave
-    mov eax, error_msg
-    ret
+; Exit Syscall
+	mov eax, 1 ; syscall sair
+	mov ebx, 0
+	int 0x80
+
 retorno:
     pop edx
     pop eax
