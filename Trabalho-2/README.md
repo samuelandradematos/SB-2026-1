@@ -21,21 +21,26 @@ sudo apt install nasm binutils gcc-multilib
 
 ```bash
 # 1. Compilar o arquivo principal
-nasm -f elf32 CALCULADORA.ASM -o CALCULADORA.O
+nasm -f elf32 CALCULADORA.asm -o CALCULADORA.o
 
 # 2. Compilar as operações (um por vez)
-nasm -f elf32 SOMA.ASM -o SOMA.O
+nasm -f elf32 SOMA.asm -o SOMA.o
+
+# 3. Compilar as funcoes auxiliares
+nasm -f elf32 AUXILIARES.asm -o AUXILIARES.o
 
 # 3. Ligar tudo em um único executável
-ld -m elf_i386 -o calculadora CALCULADORA.O SOMA.O
+ld -m elf_i386 -o calculadora AUXILIARES.o CALCULADORA.o SOMA.o 
 ```
 
 ### Script único (copie e cole no terminal)
 
 ```bash
-nasm -f elf32 CALCULADORA.ASM -o CALCULADORA.O && \
-nasm -f elf32 SOMA.ASM        -o SOMA.O        && \
-ld -m elf_i386 -o calculadora CALCULADORA.O SOMA.O && \
+nasm -f elf32 CALCULADORA.asm -o CALCULADORA.o && \
+nasm -f elf32 SOMA.asm        -o SOMA.o        && \
+nasm -f elf32 SUBTRACAO.asm        -o SUBTRACAO.o        && \
+nasm -f elf32 AUXILIARES.asm -o AUXILIARES.o   && \
+ld -m elf_i386 -o calculadora AUXILIARES.o CALCULADORA.o SOMA.o SUBTRACAO.o  && \
 echo "Compilação concluída! Execute com: ./calculadora"
 ```
 

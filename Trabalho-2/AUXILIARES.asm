@@ -1,6 +1,11 @@
 global strlen
 global remove_newline
+global atoi_32
+global atoi_16
+global itoa_32
 
+extern read_32
+extern read_16
 
 ; --
 ; remove_newline: func auxiliar para tirar o \n do fim da string
@@ -51,3 +56,158 @@ strlen:
 		pop  esi
 		pop  ebp
 		ret
+
+
+; --
+; strlen: converte de string para int 32bits
+; Parâmetro na pilha: [ponteiro_string]
+; Retorno em eax:  número
+; --
+atoi_32:
+    push ebp
+    mov ebp, esp
+    push esi            ; preserva ESI
+
+    mov ecx, [ebp+8]    ; ← lê o ponteiro da pilha
+
+    xor eax, eax
+    xor ebx, ebx
+    xor edx, edx
+
+    mov bl, [ecx]
+    cmp bl, '-'
+    jne .loop
+    mov dl, 1
+    inc ecx
+
+    .loop:
+        mov bl, [ecx]
+        cmp bl, 10
+        je .fim
+        cmp bl, 0
+        je .fim
+        sub bl, '0'
+        imul eax, eax, 10
+        movzx ebx, bl
+        add eax, ebx
+        inc ecx
+        jmp .loop
+
+    .fim:
+        cmp dl, 1
+        jne .end
+        neg eax
+
+    .end:
+        pop esi
+        pop ebp
+        ret
+
+; --
+; strlen: converte de string para int 16bits
+; Parâmetro na pilha: [ponteiro_string]
+; Retorno em eax:  número
+; --
+atoi_16:
+    push ebp
+    mov ebp, esp
+    push esi            ; preserva ESI
+
+    mov esi, [ebp+8]    ; ← lê o ponteiro da pilha (use ESI, não SI)
+
+    xor ax, ax
+    xor bx, bx
+    xor dx, dx
+
+    mov bl, [esi]
+    cmp bl, '-'
+    jne .loop
+    mov dl, 1
+    inc esi
+
+    .loop:
+        mov bl, [esi]
+        cmp bl, 10
+        je .fim
+        cmp bl, 0
+        je .fim
+        sub bl, '0'
+        imul ax, ax, 10
+        movzx bx, bl
+        add ax, bx
+        inc esi
+        jmp .loop
+
+    .fim:
+        cmp dl, 1
+        jne .end
+        neg ax
+
+    .end:
+        pop esi
+        pop ebp
+        ret
+
+; --
+; itoa_32: converte o número em EAX para string
+; Parâmetro na pilha: [endereco_buffer]
+; Retorno: EAX = endereço do início da string
+; Buffer mínimo: 12 bytes (-2147483648\0)
+; --
+
+itoa_32:
+    push ebp
+    mov ebp, esp
+    push ebx
+
+    mov edi, [ebp + 8]     ; buffer
+    add edi, 11            ; último byte do buffer
+
+    mov byte [edi], 0      ; '\0'
+    dec edi
+
+    xor ebx, ebx           ; EBX = 0 → número positivo
+
+    cmp eax, 0
+    jge .verifica_zero
+
+    mov ebx, 1             ; marca que era negativo
+    neg eax                ; torna positivo
+
+    .verifica_zero:
+        cmp eax, 0
+        jne .loop
+
+        mov byte [edi], '0'
+        dec edi
+        jmp .sinal
+
+    .loop:
+        xor edx, edx
+        mov ecx, 10
+        div ecx
+
+        add dl, '0'
+        mov [edi], dl
+        dec edi
+
+        test eax, eax
+        jnz .loop
+
+    .sinal:
+        cmp ebx, 1
+        jne .fim
+
+        mov byte [edi], '-'
+        dec edi
+
+    .fim:
+        inc edi                ; aponta para o primeiro caractere
+        mov eax, edi
+
+        pop ebx
+        mov esp, ebp
+        pop ebp
+        ret
+
+
