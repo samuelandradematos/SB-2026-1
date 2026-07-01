@@ -2,6 +2,7 @@
 
 ## Sistema Operacional
 Linux (Ubuntu 22.04 / Debian ou compatível, x86 ou com suporte a 32 bits)
+Linux (CachyOS / ArchLinux)
 
 ## Dependências
 - **NASM** (Netwide Assembler)
@@ -10,7 +11,12 @@ Linux (Ubuntu 22.04 / Debian ou compatível, x86 ou com suporte a 32 bits)
 Instalar no Ubuntu/Debian:
 ```bash
 sudo apt update
-sudo apt install nasm binutils gcc-multilib
+sudo apt install nasm binutils gcc-multilib make
+```
+Instalar no ArchLinux:
+```bash
+sudo pacman -Syu
+sudo pacman -S nasm binutils gcc-multilib make
 ```
 
 ---
@@ -19,31 +25,14 @@ sudo apt install nasm binutils gcc-multilib
 
 ### Passo a passo
 
+Para apenas compilar e ligar
 ```bash
-# 1. Compilar o arquivo principal
-nasm -f elf32 CALCULADORA.asm -o CALCULADORA.o
-
-# 2. Compilar as operações (um por vez)
-nasm -f elf32 SOMA.asm -o SOMA.o
-
-# 3. Compilar as funcoes auxiliares
-nasm -f elf32 AUXILIARES.asm -o AUXILIARES.o
-
-# 3. Ligar tudo em um único executável
-ld -m elf_i386 -o calculadora AUXILIARES.o CALCULADORA.o SOMA.o 
+make
 ```
-
-### Script único (copie e cole no terminal)
-
+Para compilar, ligar e rodar
 ```bash
-nasm -f elf32 CALCULADORA.asm -o CALCULADORA.o && \
-nasm -f elf32 SOMA.asm        -o SOMA.o        && \
-nasm -f elf32 SUBTRACAO.asm        -o SUBTRACAO.o        && \
-nasm -f elf32 AUXILIARES.asm -o AUXILIARES.o   && \
-ld -m elf_i386 -o calculadora AUXILIARES.o CALCULADORA.o SOMA.o SUBTRACAO.o  && \
-echo "Compilação concluída! Execute com: ./calculadora"
+make run
 ```
-
 ---
 
 ## Executar
@@ -56,11 +45,14 @@ echo "Compilação concluída! Execute com: ./calculadora"
 
 ## Arquivos
 
-| Arquivo         | Conteúdo                                              |
-|-----------------|-------------------------------------------------------|
-| CALCULADORA.ASM | Programa principal (`_start`), funções de I/O         |
-| SOMA.ASM        | Operação de soma (16 e 32 bits)                      |
-| README.md       | Este arquivo                                          |
+| Arquivo           | Conteúdo                                              |
+|-------------------|-------------------------------------------------------|
+| CALCULADORA.ASM   | Programa principal (`_start`), funções de I/O         |
+| SOMA.ASM          | Operação de soma (16 e 32 bits)                       |
+| SUBTRACAO.ASM     | Operação de subtração (16 e 32 bits)                  |
+| MUTIPLICACAO.ASM  | Operação de multiplicação (16 e 32 bits)              |
+| DIVISAO.ASM       | Operação de divisao (16 e 32 bits)                    |
+| README.md         | Este arquivo                                          |
 
 ---
 

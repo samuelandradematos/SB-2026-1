@@ -9,8 +9,16 @@ extern itoa_32
 ; IMPORTA OPERACOES
 extern soma_16
 extern soma_32
-extern subtracao_32
 extern subtracao_16
+extern subtracao_32
+extern multiplicacao_16
+extern multiplicacao_32
+extern divisao_16
+extern divisao_32
+extern exponenciacao_16
+extern exponenciacao_32
+extern mod_16
+extern mod_32
 
 ; exporta para os outros arquivos
 global _start
@@ -332,9 +340,23 @@ executar_menu:
 
 		cmp byte [opcao_escolhida], '2'
 		je .subtracao_32
-		; aqui depois entram outras operações:
+		
+        cmp byte [opcao_escolhida], '3'
+        je .multiplicacao_32
+
+        cmp byte [opcao_escolhida], '4'
+        je .divisao_32
+
+        cmp byte [opcao_escolhida], '5'
+        je .exponenciacao_32
+
+        cmp byte [opcao_escolhida], '6'
+        je .mod_32
+
+        ; aqui depois entram outras operações:
 		; je .mul_32
 		; etc
+
 
 		jmp .loop
 
@@ -353,7 +375,38 @@ executar_menu:
 		add esp, 8
 
 		jmp .print
+    
+    .multiplicacao_32:
+        push dword [ebp - 8]    ;num1
+        push dword [ebp - 4]    ;num2
+        call multiplicacao_32
+        add esp, 8
 
+        jmp .print
+    
+    .divisao_32:
+        push dword [ebp - 8]    ;num1
+        push dword [ebp - 4]    ;num2
+        call divisao_32
+        add esp, 8
+
+        jmp .print
+
+    .exponenciacao_32:
+        push dword [ebp - 8]    ;num1
+        push dword [ebp - 4]    ;num2
+        call exponenciacao_32
+        add esp, 8
+
+        jmp .print
+    
+    .mod_32:
+        push dword [ebp - 8]
+        push dword [ebp - 4]
+        call mod_32
+        add esp, 8
+
+        jmp .print
 
 	; OPERACOES DE 16 BITS
 	.op_16:
@@ -362,6 +415,18 @@ executar_menu:
 
 		cmp byte [opcao_escolhida], '2'
 		je .subtracao_16
+
+        cmp byte [opcao_escolhida], '3'
+        je .multiplicacao_16
+
+        cmp byte [opcao_escolhida], '4'
+        je .divisao_16
+
+        cmp byte [opcao_escolhida], '5'
+        je .exponenciacao_16
+
+        cmp byte [opcao_escolhida], '6'
+        je .mod_16
 
 		; outras operações de 16 bits vao entrar aquiii
 		jmp .loop
@@ -384,6 +449,40 @@ executar_menu:
 
 		jmp .print
 
+    .multiplicacao_16:
+        push dword [ebp - 8]
+        push dword [ebp - 4]
+        call multiplicacao_16
+        add esp, 8
+        ; retorno tmb em eax (32bits)
+
+        jmp .print
+    
+    .divisao_16:
+        push dword [ebp - 8]
+        push dword [ebp - 4]
+        call divisao_16
+        add esp, 8
+
+        jmp .print
+    
+    .exponenciacao_16:
+        push dword [ebp - 8]
+        push dword [ebp - 4]
+        call exponenciacao_16
+        add esp, 8
+
+        jmp .print
+    
+    .mod_16:
+        push dword [ebp - 8]
+        push dword [ebp - 4]
+        call mod_16
+        add esp, 8
+
+        jmp .print
+
+
 	.print: ; converte o resultado para string e printa
 		lea ecx, [ebp - 20]
 
@@ -397,7 +496,7 @@ executar_menu:
 		call strlen
 		add esp, 4
 
-		mov edx, eax
+		mov ebx, eax
 
 		; printa resultado:
 		; push msg_resultado
@@ -406,7 +505,7 @@ executar_menu:
 		; add esp, 8
 
 		push esi
-		push edx
+		push ebx
 		call print_string
 		add esp, 8
 
