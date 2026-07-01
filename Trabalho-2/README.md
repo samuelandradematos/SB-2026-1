@@ -52,6 +52,8 @@ make run
 | SUBTRACAO.ASM     | Operação de subtração (16 e 32 bits)                  |
 | MUTIPLICACAO.ASM  | Operação de multiplicação (16 e 32 bits)              |
 | DIVISAO.ASM       | Operação de divisao (16 e 32 bits)                    |
+| EXPONENCIACAO.ASM | Operação de exponenciacao (16 e 32 bits)              |
+| MOD.ASM           | Operação de mod (16 e 32 bits)                        |
 | README.md         | Este arquivo                                          |
 
 ---
