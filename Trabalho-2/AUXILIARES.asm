@@ -151,45 +151,63 @@ atoi_16:
 ; --
 ; itoa_32: converte o número em EAX para string
 ; Parâmetro na pilha: [endereco_buffer]
-; Retorno: EAX = endereco do início da string
+; Retorno: EAX = endereço do início da string
+; Buffer mínimo: 12 bytes (-2147483648\0)
 ; --
+
 itoa_32:
-	push ebp
-	mov ebp, esp
+    push ebp
+    mov ebp, esp
+    push ebx
 
-	mov edi, [ebp + 8] ; buffer recebido
-	add edi, 11        ; fim do buffer
+    mov edi, [ebp + 8]     ; buffer
+    add edi, 11            ; último byte do buffer
 
-	mov byte [edi], 0  ; terminador nulo
+    mov byte [edi], 0      ; '\0'
+    dec edi
 
-	dec edi
+    xor ebx, ebx           ; EBX = 0 → número positivo
 
-	cmp eax, 0
-	jne .loop
+    cmp eax, 0
+    jge .verifica_zero
 
-	mov byte [edi], '0'
-	mov eax, edi
-	jmp .fim
+    mov ebx, 1             ; marca que era negativo
+    neg eax                ; torna positivo
 
-	.loop:
-		xor edx, edx
-		mov ecx, 10
-		div ecx
+    .verifica_zero:
+        cmp eax, 0
+        jne .loop
 
-		add dl, '0'
-		mov [edi], dl
+        mov byte [edi], '0'
+        dec edi
+        jmp .sinal
 
-		dec edi
+    .loop:
+        xor edx, edx
+        mov ecx, 10
+        div ecx
 
-		test eax, eax
-		jnz .loop
+        add dl, '0'
+        mov [edi], dl
+        dec edi
 
-		inc edi
-		mov eax, edi
+        test eax, eax
+        jnz .loop
 
-	.fim:
-		mov esp, ebp
-		pop ebp
-		ret
+    .sinal:
+        cmp ebx, 1
+        jne .fim
+
+        mov byte [edi], '-'
+        dec edi
+
+    .fim:
+        inc edi                ; aponta para o primeiro caractere
+        mov eax, edi
+
+        pop ebx
+        mov esp, ebp
+        pop ebp
+        ret
 
 

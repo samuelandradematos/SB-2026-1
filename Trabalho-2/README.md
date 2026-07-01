@@ -38,8 +38,9 @@ ld -m elf_i386 -o calculadora AUXILIARES.o CALCULADORA.o SOMA.o
 ```bash
 nasm -f elf32 CALCULADORA.asm -o CALCULADORA.o && \
 nasm -f elf32 SOMA.asm        -o SOMA.o        && \
+nasm -f elf32 SUBTRACAO.asm        -o SUBTRACAO.o        && \
 nasm -f elf32 AUXILIARES.asm -o AUXILIARES.o   && \
-ld -m elf_i386 -o calculadora AUXILIARES.o CALCULADORA.o SOMA.o  && \
+ld -m elf_i386 -o calculadora AUXILIARES.o CALCULADORA.o SOMA.o SUBTRACAO.o  && \
 echo "Compilação concluída! Execute com: ./calculadora"
 ```
 

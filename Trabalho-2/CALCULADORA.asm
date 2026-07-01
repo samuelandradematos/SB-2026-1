@@ -1,3 +1,4 @@
+; IMPORTA FUNCOES AUXILIARES
 extern strlen
 extern remove_newline
 extern ler_operandos
@@ -5,19 +6,18 @@ extern atoi_16
 extern atoi_32
 extern itoa_32
 
+; IMPORTA OPERACOES
 extern soma_16
 extern soma_32
+extern subtracao_32
+extern subtracao_16
 
+; exporta para os outros arquivos
 global _start
-global print_string       ; exporta para os outros arquivos
+global print_string       
 global read_string
 global read_32
 global read_16
-; global read_num16
-; global read_num32
-; global print_int
-
-; extern soma               ; importa de SOMA.ASM
 
 
 section .data
@@ -330,8 +330,9 @@ executar_menu:
 		cmp byte [opcao_escolhida], '1'
 		je .soma_32
 
+		cmp byte [opcao_escolhida], '2'
+		je .subtracao_32
 		; aqui depois entram outras operações:
-		; je .sub_32
 		; je .mul_32
 		; etc
 
@@ -345,11 +346,22 @@ executar_menu:
 
 		jmp .print
 
+	.subtracao_32:
+		push dword [ebp - 8]   ; num2
+		push dword [ebp - 4]   ; num1
+		call subtracao_32
+		add esp, 8
+
+		jmp .print
+
 
 	; OPERACOES DE 16 BITS
 	.op_16:
 		cmp byte [opcao_escolhida], '1'
 		je .soma_16
+
+		cmp byte [opcao_escolhida], '2'
+		je .subtracao_16
 
 		; outras operações de 16 bits vao entrar aquiii
 		jmp .loop
@@ -358,6 +370,15 @@ executar_menu:
 		push dword [ebp - 8]
 		push dword [ebp - 4]
 		call soma_16
+		add esp, 8
+		; retorno tbm em eax (32bits)
+
+		jmp .print
+
+	.subtracao_16:
+		push dword [ebp - 8]
+		push dword [ebp - 4]
+		call subtracao_16
 		add esp, 8
 		; retorno tbm em eax (32bits)
 
