@@ -21,7 +21,9 @@ exponenciacao_32:
     call multiplicacao_32   ; Chama multiplicacao_32 para realizar a operação
     sub ecx, 2
     cmp ecx, 1
-    jge .loop_exp_32        ; Vai para o loop se o expoente for maior que 2
+    jge .loop_exp_32        ; Vai para o loop se o expoente for maior que 3
+    pop ecx
+    pop ebx
     leave
     ret
 
@@ -63,7 +65,9 @@ exponenciacao_16:
     call multiplicacao_16   ; Chama multiplicacao_16 para realizar a operação
     sub cx, 2               ; Subtrai 2 do expoente(primeira operação é equivalente a base²)
     cmp cx, 1
-    jge .loop_exp_16        ; Vai para o loop se o expoente for maior que 2
+    jge .loop_exp_16        ; Vai para o loop se o expoente for maior que 3
+    pop ecx
+    pop ebx
     leave
     ret
 
@@ -79,6 +83,7 @@ exponenciacao_16:
         mov ax, 1
         pop ecx
         pop ebx
+        movsx eax, ax
         leave
         ret
 
@@ -86,5 +91,6 @@ exponenciacao_16:
         mov ax, [ebp + 12]
         pop ecx
         pop ebx
+        movsx eax, ax
         leave
         ret

@@ -4,21 +4,22 @@ extern print_string
 
 segment .data
 error_msg db "OCORREU OVERFLOW", 0 ; Texto a ser exibido quando ocorre overflow
-tam_error_msg equ $-error_msg ; Tamanho da mensagem de erro
+tam_error_msg equ $-error_msg-1 ; Tamanho da mensagem de erro
 
 segment .text
 
 multiplicacao_16:
     enter 0,0
     push edx
+    push ebx
     mov ax, [ebp + 12]
     mov bx, [ebp + 8]
     imul bx
     movsx eax, ax    
     cmp dx, 0x0000
     je retorno
-    push dword tam_error_msg
     push dword error_msg
+    push dword tam_error_msg
     call print_string
     add esp, 8
     ; Exit Syscall
@@ -29,13 +30,15 @@ multiplicacao_16:
 multiplicacao_32:
     enter 0,0
     push edx
+    push ebx
     mov edx, 0x00000000
     mov eax, [ebp + 12]
-    imul [ebp + 8]
+    mov ebx, [ebp + 8]
+    imul ebx
     cmp edx, 0x00000000
     je retorno
-    push dword tam_error_msg
     push dword error_msg
+    push dword tam_error_msg
     call print_string
     add esp, 8
     ; Exit Syscall
@@ -45,6 +48,7 @@ multiplicacao_32:
 
 retorno:
     pop edx
+    pop ebx
     leave
     ret
 
