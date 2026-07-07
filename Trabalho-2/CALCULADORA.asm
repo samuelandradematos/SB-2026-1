@@ -22,7 +22,7 @@ extern mod_32
 
 ; exporta para os outros arquivos
 global _start
-global print_string       
+global print_strinstg       
 global read_string
 global read_32
 global read_16
