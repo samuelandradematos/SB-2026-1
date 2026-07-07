@@ -3,7 +3,7 @@ global multiplicacao_32
 extern print_string
 
 segment .data
-error_msg db "OCORREU OVERFLOW", 0 ; Texto a ser exibido quando ocorre overflow
+error_msg db "OCORREU OVERFLOW!", 0 ; Texto a ser exibido quando ocorre overflow
 tam_error_msg equ $-error_msg-1 ; Tamanho da mensagem de erro
 
 segment .text
